@@ -143,7 +143,8 @@ Get/Set database username.
 
 =item $self->version
 
-Get migration version from database.
+Get migration version from database. Will be undef if no migration has taken
+place yet.
 
 =cut
 
@@ -168,7 +169,7 @@ sub _connect {
             AutoCommit => 1
         }
       )
-      or die qq/Couldn't connect to database, "$!"/;
+      or die sprintf(qq/Couldn't connect to database %s: %s/, $self->dsn, $DBI::errstr);
     $self->dbh($self->{_dbh})
 }
 
