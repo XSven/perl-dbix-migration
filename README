@@ -54,7 +54,8 @@ METHODS
         Get/Set database username.
 
     $self->version
-        Get migration version from database.
+        Get migration version from database. Will be undef if no migration
+        has taken place yet.
 
 AUTHOR
     Sebastian Riedel, "sri@oook.de"
