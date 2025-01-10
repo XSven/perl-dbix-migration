@@ -9,9 +9,9 @@ plan skip_all => 'Test::PostgresSQL required' if $@;
 
 my $pgsql = Test::PostgreSQL->new()
       or plan skip_all => $Test::PostgreSQL::errstr;
-       
+
 plan tests => 8;
-        
+
 
 my $m = DBIx::Migration->new;
 $m->dsn($pgsql->dsn);
