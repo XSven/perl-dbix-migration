@@ -44,6 +44,9 @@ METHODS
     $self->dsn($dsn)
         Get/Set dsn.
 
+    $self->dbh($dsn)
+        Get/Set dbh.
+
     $self->migrate($version)
         Migrate database to version.
 
