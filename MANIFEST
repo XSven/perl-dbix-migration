@@ -14,3 +14,4 @@ t/sql/sqlite_2_up.sql
 META.yml
 Makefile.PL
 README
+META.json
