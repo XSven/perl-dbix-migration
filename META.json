@@ -42,9 +42,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/XSven/perl-dbix-migration/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/XSven/perl-dbix-migration.git"
+      }
    },
    "version" : "0.08"
 }

@@ -24,7 +24,7 @@ requires:
   File::Slurp: '0'
   File::Spec: '0'
 resources:
-  license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/XSven/perl-dbix-migration/issues
+  license: http://dev.perl.org/licenses/
   repository: git://github.com/XSven/perl-dbix-migration.git
 version: '0.08'
