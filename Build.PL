@@ -19,7 +19,7 @@ my $build = Module::Build->new(
     requires => {
         'File::Slurp'           => 0,
         'File::Spec'            => 0,
-        'DBI'                   => 1.33,
+        'DBI'                   => 1.33, # DBI::clone() is in use
         'DBD::SQLite'           => 0,
         'Class::Accessor::Fast' => 0
     },

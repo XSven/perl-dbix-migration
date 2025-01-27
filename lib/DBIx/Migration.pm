@@ -158,7 +158,7 @@ sub version {
 
 sub _connect {
     my $self = shift;
-    return $self->{_dbh}= $self->dbh->clone if $self->dbh;
+    return $self->{_dbh}= $self->dbh->clone({}) if $self->dbh;
     $self->{_dbh} = DBI->connect(
         $self->dsn,
         $self->username,
