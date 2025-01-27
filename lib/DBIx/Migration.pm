@@ -248,7 +248,17 @@ EOF
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri@oook.de>
+Sebastian Riedel, <kraihx@gmail.com>
+
+=head1 CONTRIBUTORS
+
+Dan Sully, <dan+github@sully.org>
+
+Marcus Ramberg, <marcus@nordaaker.com>
+
+Steven Jenkin, <sjenkin@venda.com>
+
+Sven Willenbuecher, <sven.willenbuecher@gmx.de>
 
 =head1 COPYRIGHT
 

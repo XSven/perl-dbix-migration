@@ -6,15 +6,20 @@ my $build = Module::Build->new(
     license            => 'perl',
     module_name        => 'DBIx::Migration',
     configure_requires => {
-        'Module::Build' => 0.42
+        'CPAN::Meta::Converter' => 2.15,
+        'Module::Build'         => 0.42
     },
     test_requires => {
-        'Test::PostgreSQL'      => 0
+        'Test::PostgreSQL' => 0
+    },
+    recommends => {
+        'Test::Pod'           => 1.14,
+        'Test::Pod::Coverage' => 1.04
     },
     requires => {
         'File::Slurp'           => 0,
         'File::Spec'            => 0,
-        'DBI'                   => 0,
+        'DBI'                   => 1.33,
         'DBD::SQLite'           => 0,
         'Class::Accessor::Fast' => 0
     },

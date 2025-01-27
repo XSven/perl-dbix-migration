@@ -1,7 +1,7 @@
 {
    "abstract" : "Seamless DB schema up- and downgrades",
    "author" : [
-      "Sebastian Riedel, C<sri@oook.de>"
+      "Sebastian Riedel, <kraihx@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
@@ -10,20 +10,25 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Migration",
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "CPAN::Meta::Converter" : "2.15",
             "Module::Build" : "0.42"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         },
          "requires" : {
             "Class::Accessor::Fast" : "0",
             "DBD::SQLite" : "0",
-            "DBI" : "0",
+            "DBI" : "1.33",
             "File::Slurp" : "0",
             "File::Spec" : "0"
          }
@@ -53,5 +58,6 @@
          "url" : "git://github.com/XSven/perl-dbix-migration.git"
       }
    },
-   "version" : "0.08"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
