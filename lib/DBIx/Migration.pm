@@ -10,6 +10,8 @@ our $VERSION = '0.08';
 
 __PACKAGE__->mk_accessors(qw/debug dir dsn password username dbh/);
 
+=pod
+
 =head1 NAME
 
 DBIx::Migration - Seamless DB schema up- and downgrades
@@ -133,6 +135,8 @@ sub migrate {
     return 1;
 }
 
+=pod
+
 =item $self->password
 
 Get/Set database password.
@@ -244,6 +248,8 @@ EOF
     return $version;
 }
 
+=pod
+
 =back
 
 =head1 AUTHOR
@@ -261,6 +267,8 @@ Steven Jenkin, <sjenkin@venda.com>
 Sven Willenbuecher, <sven.willenbuecher@gmx.de>
 
 =head1 COPYRIGHT
+
+Copyright 2004-2005 Sebastian Riedel. All rights reserved.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
