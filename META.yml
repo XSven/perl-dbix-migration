@@ -3,6 +3,7 @@ abstract: 'Seamless DB schema up- and downgrades'
 author:
   - 'Sebastian Riedel, <kraihx@gmail.com>'
 build_requires:
+  DBD::SQLite: '0'
   Test::PostgreSQL: '0'
 configure_requires:
   CPAN::Meta::Converter: '2.15'
@@ -19,11 +20,11 @@ provides:
     file: lib/DBIx/Migration.pm
     version: '0.08'
 recommends:
-  Test::Pod: '1.14'
+  Test::Needs: '0'
+  Test::Pod: '1.26'
   Test::Pod::Coverage: '1.04'
 requires:
   Class::Accessor::Fast: '0'
-  DBD::SQLite: '0'
   DBI: '1.33'
   File::Slurp: '0'
   File::Spec: '0'
@@ -32,4 +33,4 @@ resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/XSven/perl-dbix-migration.git
 version: '0.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
