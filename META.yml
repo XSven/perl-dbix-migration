@@ -18,7 +18,7 @@ name: DBIx-Migration
 provides:
   DBIx::Migration:
     file: lib/DBIx/Migration.pm
-    version: '0.08'
+    version: '0.09'
 recommends:
   Test::Needs: '0'
   Test::Pod: '1.26'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/XSven/perl-dbix-migration/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/XSven/perl-dbix-migration.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

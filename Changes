@@ -1,8 +1,10 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
-????  Wed Jan 29 09:09:14 CET 2025
-        - configure and use perltidy
-        - update prerequisite setup
+0.09 Wed Jan 29 09:09:14 CET 2025
+        - Consider CPAN testers feedback: fix Test::PostgreSQL::new()
+          exception handling in unit test script
+        - Configure and use perltidy
+        - Update prerequisite setup
 
 0.08  Mon Jan 27 07:26:05 CET 2025
         - Fix insufficient _connect() error reporting [RT #158385]
@@ -30,7 +32,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Fixed the multiple sql statement bug
 
 0.02  2005-10-24 01:00:00
-        - default to newest version
+        - Default to newest version
 
 0.01  2005-10-24 00:00:00
-        - first release
+        - First release

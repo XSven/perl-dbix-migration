@@ -8,7 +8,7 @@ use DBIx::Migration;
 eval { require Test::PostgreSQL };
 plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
 
-my $pgsql = Test::PostgreSQL->new() or do {
+my $pgsql = eval { Test::PostgreSQL->new() } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
