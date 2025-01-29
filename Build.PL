@@ -13,6 +13,7 @@ my $build = Module::Build->new(
   },
   test_requires => {
     'DBD::SQLite'      => 0,
+    'Test::API'        => 0,
     'Test::PostgreSQL' => 0
   },
   recommends => {

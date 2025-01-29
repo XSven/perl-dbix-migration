@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use parent qw( Class::Accessor::Fast );
 
-use DBI;
-use File::Slurp;
-use File::Spec;
+use DBI         qw();
+use File::Slurp qw();
+use File::Spec  qw();
 
 our $VERSION = '0.09';
 
@@ -45,7 +45,7 @@ sub migrate {
       my $ver  = $file->{ version };
       print qq/Processing "$name"\n/ if $self->debug;
       next unless $file;
-      my $text = read_file( $name );
+      my $text = File::Slurp::read_file( $name );
       $text =~ s/\s*--.*$//g;
       for my $sql ( split /;/, $text ) {
         next unless $sql =~ /\w/;
