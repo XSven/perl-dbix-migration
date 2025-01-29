@@ -1,16 +1,30 @@
 package DBIx::Migration;
 
-use strict;
-use warnings;
-use parent qw( Class::Accessor::Fast );
+our $VERSION = '0.09';
 
+use Moo;
 use DBI         qw();
 use File::Slurp qw();
 use File::Spec  qw();
 
-our $VERSION = '0.09';
+use namespace::clean;
 
-__PACKAGE__->mk_accessors( qw( debug dir dsn password username dbh  ) );
+has [ qw( debug dir dsn password username ) ] => ( is => 'rw' );
+has dbh                                       => ( is => 'lazy' );
+
+sub _build_dbh {
+  my $self = shift;
+  return DBI->connect(
+    $self->dsn,
+    $self->username,
+    $self->password,
+    {
+      RaiseError => !!1,
+      PrintError => !!0,
+      AutoCommit => !!1
+    }
+  );
+}
 
 sub migrate {
   my ( $self, $wanted ) = @_;
@@ -50,9 +64,9 @@ sub migrate {
       for my $sql ( split /;/, $text ) {
         next unless $sql =~ /\w/;
         print "$sql\n" if $self->debug;
-        $self->{ _dbh }->do( $sql );
-        if ( $self->{ _dbh }->err ) {
-          die "Database error: " . $self->{ _dbh }->errstr;
+        $self->{ _dbh_clone }->do( $sql );
+        if ( $self->{ _dbh_clone }->err ) {
+          die "Database error: " . $self->{ _dbh_clone }->errstr;
         }
       }
       $ver -= 1 if ( ( $ver > 0 ) && ( $type eq 'down' ) );
@@ -78,36 +92,27 @@ sub version {
 
 sub _connect {
   my $self = shift;
-  return $self->{ _dbh } = $self->dbh->clone( {} ) if $self->dbh;
-  $self->{ _dbh } = DBI->connect(
-    $self->dsn,
-    $self->username,
-    $self->password,
-    {
-      RaiseError => 0,
-      PrintError => 0,
-      AutoCommit => 1
-    }
-  ) or die sprintf( qq/Couldn't connect to database %s: %s/, $self->dsn, $DBI::errstr );
-  $self->dbh( $self->{ _dbh } );
+  $self->{ _dbh_clone } = $self->dbh->clone( {} );
+  return;
 }
 
 sub _create_migration_table {
   my $self = shift;
-  $self->{ _dbh }->do( <<"EOF");
+  $self->{ _dbh_clone }->do( <<"EOF");
 CREATE TABLE dbix_migration (
     name VARCHAR(64) PRIMARY KEY,
     value VARCHAR(64)
 );
 EOF
-  $self->{ _dbh }->do( <<"EOF");
+  $self->{ _dbh_clone }->do( <<"EOF");
     INSERT INTO dbix_migration ( name, value ) VALUES ( 'version', '0' );
 EOF
 }
 
 sub _disconnect {
   my $self = shift;
-  $self->{ _dbh }->disconnect;
+  $self->{ _dbh_clone }->disconnect;
+  return;
 }
 
 sub _files {
@@ -143,7 +148,7 @@ sub _newest {
 
 sub _update_migration_table {
   my ( $self, $version ) = @_;
-  $self->{ _dbh }->do( <<"EOF");
+  $self->{ _dbh_clone }->do( <<"EOF");
 UPDATE dbix_migration SET value = '$version' WHERE name = 'version';
 EOF
 }
@@ -152,7 +157,8 @@ sub _version {
   my $self    = shift;
   my $version = undef;
   eval {
-    my $sth = $self->{ _dbh }->prepare( <<"EOF");
+    print "Using database handle $self->{_dbh_clone}\n" if $self->debug;
+    my $sth = $self->{ _dbh_clone }->prepare( <<"EOF");
 SELECT value FROM dbix_migration WHERE name = ?;
 EOF
     $sth->execute( 'version' );
@@ -160,6 +166,7 @@ EOF
       $version = $val->[ 0 ];
     }
   };
+  print "$@";
   return $version;
 }
 
