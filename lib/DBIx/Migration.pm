@@ -104,7 +104,6 @@ sub _connect {
   return;
 }
 
-
 sub _disconnect {
   my $self = shift;
   $self->{ _dbh_clone }->disconnect;
@@ -146,8 +145,7 @@ sub _get_version_from_migration_table {
   my $self = shift;
 
   try {
-    my $dbh = $self->{ _dbh_clone };
-    my $sth = $dbh->prepare( <<'EOF');
+    my $sth = $self->{ _dbh_clone }->prepare( <<'EOF');
 SELECT value FROM dbix_migration WHERE name = ?;
 EOF
     $sth->execute( 'version' );
