@@ -7,7 +7,7 @@ use boolean               qw( false true );
 use DBI                   qw();
 use File::Spec            qw();
 use Path::Tiny            qw( path );
-use Try::Tiny             qw( catch try );
+use Try::Tiny             qw( try );
 use Types::Common::String qw( NonEmptyStr );
 use Types::Standard       qw( Bool Str );
 use Types::Path::Tiny     qw( Dir );
@@ -38,7 +38,7 @@ sub migrate {
   my ( $self, $wanted ) = @_;
   $self->_connect;
   $wanted = $self->_newest_version unless defined $wanted;
-  my $version = $self->_version;
+  my $version = $self->_get_version_from_migration_table;
   unless ( defined $version ) {
     $self->_create_migration_table;
     $version = 0;
@@ -81,7 +81,7 @@ sub migrate {
       $self->_update_migration_table( $ver );
     }
   } else {
-    my $newver = $self->_version;
+    my $newver = $self->_get_version_from_migration_table;
     print STDERR "Database is at version $newver, couldn't migrate to $wanted\n"
       if ( $self->debug && ( $wanted != $newver ) );
     return false;
@@ -93,7 +93,7 @@ sub migrate {
 sub version {
   my $self = shift;
   $self->_connect;
-  my $version = $self->_version;
+  my $version = $self->_get_version_from_migration_table;
   $self->_disconnect;
   return $version;
 }
@@ -142,7 +142,7 @@ sub _newest_version {
   $newest_version;
 }
 
-sub _version {
+sub _get_version_from_migration_table {
   my $self = shift;
 
   try {
@@ -157,13 +157,6 @@ EOF
       $version = $val->[ 0 ];
     }
     $version;
-  } catch {
-    # FIXME: make it portable
-    # https://www.perlmonks.org/?node=DBI%20Recipes#tablecheck
-    # https://www.perlmonks.org/?node_id=500050 (Checking for DB table existence using DBI/DBD)
-    # the first match refers to SQLite and the second match refers to PostgreSQL
-    # die $_ unless m/no such table: dbix_migration|relation "dbix_migration" does not exist/;
-    undef;
   };
 }
 
