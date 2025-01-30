@@ -179,9 +179,11 @@ EOF
     }
     $version;
   } catch {
-    # FIXME: make it portable (https://www.perlmonks.org/?node=DBI%20Recipes#tablecheck)
+    # FIXME: make it portable
+    # https://www.perlmonks.org/?node=DBI%20Recipes#tablecheck
+    # https://www.perlmonks.org/?node_id=500050 (Checking for DB table existence using DBI/DBD)
     # the first match refers to SQLite and the second match refers to PostgreSQL
-    die $_ unless m/no such table: dbix_migration|relation "dbix_migration" does not exist/;
+    # die $_ unless m/no such table: dbix_migration|relation "dbix_migration" does not exist/;
     undef;
   }
 }
