@@ -37,7 +37,7 @@ sub _build_dbh {
 sub migrate {
   my ( $self, $wanted ) = @_;
   $self->_connect;
-  $wanted = $self->_newest unless defined $wanted;
+  $wanted = $self->_newest_version unless defined $wanted;
   my $version = $self->_version;
   unless ( defined $version ) {
     $self->_create_migration_table;
@@ -139,26 +139,29 @@ sub _files {
   return @files ? \@files : undef;
 }
 
-sub _newest {
-  my $self   = shift;
-  my $newest = 0;
+sub _newest_version {
+  my $self = shift;
 
+  my $newest_version = 0;
   $self->dir->visit(
     sub {
       return unless m/_up\.sql\z/;
       m/\D*(\d+)_up.sql\z/;
-      $newest = $1 if $1 > $newest;
+      $newest_version = $1 if $1 > $newest_version;
     }
   );
 
-  return $newest;
+  $newest_version;
 }
 
 sub _update_migration_table {
   my ( $self, $version ) = @_;
-  $self->{ _dbh_clone }->do( <<"EOF");
-UPDATE dbix_migration SET value = '$version' WHERE name = 'version';
+
+  $self->{ _dbh_clone }->do( <<'EOF', undef, $version, 'version');
+UPDATE dbix_migration SET value = ? WHERE name = ?;
 EOF
+
+  undef;
 }
 
 sub _version {
@@ -183,7 +186,7 @@ EOF
     # the first match refers to SQLite and the second match refers to PostgreSQL
     # die $_ unless m/no such table: dbix_migration|relation "dbix_migration" does not exist/;
     undef;
-  }
+  };
 }
 
 1;
