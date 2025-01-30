@@ -1,20 +1,20 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More import => [ qw( is like ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
-use DBIx::Migration;
-
 eval { require DBD::SQLite };
-my $class = $@ ? 'SQLite2' : 'SQLite';
+plan $@ eq '' ? ( tests => 19 ) : ( skip_all => 'DBD::SQLite required' );
 
-like exception { DBIx::Migration->new( { dsn => "dbi:$class:dbname=./t/missing/sqlite_test" } )->version },
+require DBIx::Migration;
+
+like exception { DBIx::Migration->new( { dsn => "dbi:SQLite:dbname=./t/missing/sqlite_test" } )->version },
   qr/unable to open database file/, 'missing database file';
 
 my $m = DBIx::Migration->new;
 dies_ok { $m->version } '"dsn" not set';
-$m->dsn( "dbi:$class:dbname=./t/sqlite_test" );
+$m->dsn( "dbi:SQLite:dbname=./t/sqlite_test" );
 
 ok !exists $m->{ _dbh_clone }, '_dbh_clone does not exist';
 ok !exists $m->{ dbh },        'dbh does not exist';
@@ -26,6 +26,10 @@ ok !$m->{ _dbh_clone }->{ Active }, 'disconnected';
 
 ok exists $m->{ dbh },  'dbh exists';
 ok $m->dbh->{ Active }, 'connected';
+
+ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
+
+is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( './t/sql/' );

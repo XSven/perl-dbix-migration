@@ -39,14 +39,14 @@ sub migrate {
   $self->_connect;
   $wanted = $self->_newest unless defined $wanted;
   my $version = $self->_version;
-  if ( defined $version && ( $wanted == $version ) ) {
-    print STDERR "Database is already at version $wanted\n" if $self->debug;
-    return 1;
-  }
-
   unless ( defined $version ) {
     $self->_create_migration_table;
     $version = 0;
+  }
+
+  if ( $wanted == $version ) {
+    print STDERR "Database is already at version $wanted\n" if $self->debug;
+    return true;
   }
 
   # Up- or downgrade
@@ -84,7 +84,7 @@ sub migrate {
     my $newver = $self->_version;
     print STDERR "Database is at version $newver, couldn't migrate to $wanted\n"
       if ( $self->debug && ( $wanted != $newver ) );
-    return 0;
+    return false;
   }
   $self->_disconnect;
   return true;
@@ -106,13 +106,13 @@ sub _connect {
 
 sub _create_migration_table {
   my $self = shift;
-  $self->{ _dbh_clone }->do( <<"EOF");
+  $self->{ _dbh_clone }->do( <<'EOF');
 CREATE TABLE dbix_migration (
     name VARCHAR(64) PRIMARY KEY,
     value VARCHAR(64)
 );
 EOF
-  $self->{ _dbh_clone }->do( <<"EOF");
+  $self->{ _dbh_clone }->do( <<'EOF');
     INSERT INTO dbix_migration ( name, value ) VALUES ( 'version', '0' );
 EOF
 }
