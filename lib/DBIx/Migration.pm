@@ -104,18 +104,6 @@ sub _connect {
   return;
 }
 
-sub _create_migration_table {
-  my $self = shift;
-  $self->{ _dbh_clone }->do( <<'EOF');
-CREATE TABLE dbix_migration (
-    name VARCHAR(64) PRIMARY KEY,
-    value VARCHAR(64)
-);
-EOF
-  $self->{ _dbh_clone }->do( <<'EOF');
-    INSERT INTO dbix_migration ( name, value ) VALUES ( 'version', '0' );
-EOF
-}
 
 sub _disconnect {
   my $self = shift;
@@ -154,16 +142,6 @@ sub _newest_version {
   $newest_version;
 }
 
-sub _update_migration_table {
-  my ( $self, $version ) = @_;
-
-  $self->{ _dbh_clone }->do( <<'EOF', undef, $version, 'version');
-UPDATE dbix_migration SET value = ? WHERE name = ?;
-EOF
-
-  undef;
-}
-
 sub _version {
   my $self = shift;
 
@@ -187,6 +165,29 @@ EOF
     # die $_ unless m/no such table: dbix_migration|relation "dbix_migration" does not exist/;
     undef;
   };
+}
+
+sub _create_migration_table {
+  my $self = shift;
+
+  $self->{ _dbh_clone }->do( <<'EOF');
+CREATE TABLE dbix_migration ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
+EOF
+  $self->{ _dbh_clone }->do( <<'EOF', undef, 'version', 0 );
+INSERT INTO dbix_migration ( name, value ) VALUES ( ?, ? );
+EOF
+
+  undef;
+}
+
+sub _update_migration_table {
+  my ( $self, $version ) = @_;
+
+  $self->{ _dbh_clone }->do( <<'EOF', undef, $version, 'version' );
+UPDATE dbix_migration SET value = ? WHERE name = ?;
+EOF
+
+  undef;
 }
 
 1;
