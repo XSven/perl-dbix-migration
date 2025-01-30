@@ -128,13 +128,12 @@ sub _files {
   my @files;
   for my $i ( @$need ) {
     no warnings 'uninitialized';
-    opendir( DIR, $self->dir ) or die $!;
-    while ( my $file = readdir( DIR ) ) {
-      next unless $file =~ /(^|\D)${i}_$type\.sql$/;
-      $file = $self->dir->child( $file );
-      push @files, { name => $file, version => $i };
-    }
-    closedir( DIR );
+    $self->dir->visit(
+      sub {
+        return unless m/(?:\z|\D)${i}_$type\.sql$/;
+        push @files, { name => $_, version => $i };
+      }
+    );
   }
   return undef unless @$need == @files;
   return @files ? \@files : undef;
@@ -144,13 +143,13 @@ sub _newest {
   my $self   = shift;
   my $newest = 0;
 
-  opendir( DIR, $self->dir ) or die $!;
-  while ( my $file = readdir( DIR ) ) {
-    next unless $file =~ /_up\.sql$/;
-    $file =~ /\D*(\d+)_up.sql$/;
-    $newest = $1 if $1 > $newest;
-  }
-  closedir( DIR );
+  $self->dir->visit(
+    sub {
+      return unless m/_up\.sql\z/;
+      m/\D*(\d+)_up.sql\z/;
+      $newest = $1 if $1 > $newest;
+    }
+  );
 
   return $newest;
 }
