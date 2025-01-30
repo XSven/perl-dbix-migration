@@ -10,10 +10,10 @@ META.yml
 README
 script/dbix-migration.pl
 t/01-load.t
-t/02-pod.t
-t/03-podcoverage.t
 t/04-sqlite.t
 t/05-postgres.t
+t/06-pod.t
+t/07-podcoverage.t
 t/sql/sqlite_1_down.sql
 t/sql/sqlite_1_up.sql
 t/sql/sqlite_2_down.sql
