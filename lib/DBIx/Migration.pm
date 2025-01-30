@@ -6,6 +6,7 @@ use Moo;
 use DBI         qw();
 use File::Slurp qw();
 use File::Spec  qw();
+use Try::Tiny   qw( catch try );
 
 use namespace::clean;
 
@@ -154,20 +155,27 @@ EOF
 }
 
 sub _version {
-  my $self    = shift;
-  my $version = undef;
-  eval {
-    print "Using database handle $self->{_dbh_clone}\n" if $self->debug;
-    my $sth = $self->{ _dbh_clone }->prepare( <<"EOF");
+  my $self = shift;
+
+  try {
+    my $dbh = $self->{ _dbh_clone };
+    print "Using database handle $dbh\n" if $self->debug;
+    my $sth = $dbh->prepare( <<'EOF');
 SELECT value FROM dbix_migration WHERE name = ?;
 EOF
     $sth->execute( 'version' );
+    my $version;
+    # TODO: The loop is strange. There should be only one row!
     for my $val ( $sth->fetchrow_arrayref ) {
       $version = $val->[ 0 ];
     }
-  };
-  print "$@";
-  return $version;
+    $version;
+  } catch {
+    # FIXME: make it portable (https://www.perlmonks.org/?node=DBI%20Recipes#tablecheck)
+    # the first match refers to SQLite and the second match refers to PostgreSQL
+    die $_ unless m/no such table: dbix_migration|relation "dbix_migration" does not exist/;
+    undef;
+  }
 }
 
 1;

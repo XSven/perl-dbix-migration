@@ -27,6 +27,7 @@ my $build = Module::Build->new(
     'File::Slurp'      => 0,
     'File::Spec'       => 0,
     'Moo'              => 0,
+    'Try::Tiny'        => 0,
     'namespace::clean' => 0
   },
   create_readme => 1,
