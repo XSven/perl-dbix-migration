@@ -40,7 +40,7 @@ sub migrate {
   $wanted = $self->_newest unless defined $wanted;
   my $version = $self->_version;
   if ( defined $version && ( $wanted == $version ) ) {
-    print "Database is already at version $wanted\n" if $self->debug;
+    print STDERR "Database is already at version $wanted\n" if $self->debug;
     return 1;
   }
 
@@ -65,13 +65,13 @@ sub migrate {
     for my $file ( @$files ) {
       my $name = $file->{ name };
       my $ver  = $file->{ version };
-      print qq/Processing "$name"\n/ if $self->debug;
+      print STDERR qq/Processing "$name"\n/ if $self->debug;
       next unless $file;
       my $text = path( $name )->slurp_raw;
       $text =~ s/\s*--.*$//g;
       for my $sql ( split /;/, $text ) {
         next unless $sql =~ /\w/;
-        print "$sql\n" if $self->debug;
+        #print STDERR "$sql\n" if $self->debug;
         $self->{ _dbh_clone }->do( $sql );
         if ( $self->{ _dbh_clone }->err ) {
           die "Database error: " . $self->{ _dbh_clone }->errstr;
@@ -82,12 +82,12 @@ sub migrate {
     }
   } else {
     my $newver = $self->_version;
-    print "Database is at version $newver, couldn't migrate to $wanted\n"
+    print STDERR "Database is at version $newver, couldn't migrate to $wanted\n"
       if ( $self->debug && ( $wanted != $newver ) );
     return 0;
   }
   $self->_disconnect;
-  return 1;
+  return true;
 }
 
 sub version {
@@ -167,7 +167,6 @@ sub _version {
 
   try {
     my $dbh = $self->{ _dbh_clone };
-    print "Using database handle $dbh\n" if $self->debug;
     my $sth = $dbh->prepare( <<'EOF');
 SELECT value FROM dbix_migration WHERE name = ?;
 EOF

@@ -3,6 +3,9 @@ This file documents the revision history for Perl extension DBIx::Migration.
 ?.??  Wed Jan 29 16:22:10 CET 2025
         - Add API test
         - Use Moo object system
+        - Use Type::Tiny constraints
+        - Use Path::Tiny
+        - Send debug output to stderr instead of stdout
 
 0.09  Wed Jan 29 09:09:14 CET 2025
         - Consider CPAN testers feedback: fix Test::PostgreSQL::new()
