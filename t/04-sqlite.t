@@ -5,7 +5,7 @@ use Test::More import => [ qw( is like ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 19 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 20 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -55,7 +55,8 @@ $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
 $target_version = 2;
-subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+ok $m->migrate, 'migrate to newest version';
+is $m->version, $target_version, 'check version';
 
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
