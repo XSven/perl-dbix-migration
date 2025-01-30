@@ -3,6 +3,7 @@ package DBIx::Migration;
 our $VERSION = '0.09';
 
 use Moo;
+use boolean     qw( false true );
 use DBI         qw();
 use File::Slurp qw();
 use File::Spec  qw();
@@ -10,8 +11,9 @@ use Try::Tiny   qw( catch try );
 
 use namespace::clean;
 
-has [ qw( debug dir dsn password username ) ] => ( is => 'rw' );
-has dbh                                       => ( is => 'lazy' );
+has [ qw( debug dir dsn ) ]     => ( is => 'rw' );
+has [ qw( password username ) ] => ( is => 'rw', default => '' );
+has dbh                         => ( is => 'lazy' );
 
 sub _build_dbh {
   my $self = shift;
@@ -20,9 +22,9 @@ sub _build_dbh {
     $self->username,
     $self->password,
     {
-      RaiseError => !!1,
-      PrintError => !!0,
-      AutoCommit => !!1
+      RaiseError => true,
+      PrintError => false,
+      AutoCommit => true
     }
   );
 }
