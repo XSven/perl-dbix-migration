@@ -28,9 +28,11 @@
          },
          "requires" : {
             "DBI" : "1.33",
-            "File::Slurp" : "0",
-            "File::Spec" : "0",
             "Moo" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "Types::Path::Tiny" : "0",
+            "boolean" : "0",
             "namespace::clean" : "0"
          }
       },

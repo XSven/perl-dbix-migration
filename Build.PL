@@ -23,13 +23,13 @@ my $build = Module::Build->new(
     'Test::Pod::Coverage' => 1.04
   },
   requires => {
-    'DBI'              => 1.33,    # DBI::clone() is in use
-    'File::Slurp'      => 0,
-    'File::Spec'       => 0,
-    'Moo'              => 0,
-    'Try::Tiny'        => 0,
-    'boolean'          => 0,
-    'namespace::clean' => 0
+    'DBI'               => 1.33,    # DBI::clone() is in use
+    'Moo'               => 0,
+    'Try::Tiny'         => 0,
+    'Type::Tiny'        => 0,
+    'Types::Path::Tiny' => 0,
+    'boolean'           => 0,
+    'namespace::clean'  => 0
   },
   create_readme => 1,
   script_files  => [ glob( 'script/*' ) ],

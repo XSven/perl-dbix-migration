@@ -3,16 +3,21 @@ package DBIx::Migration;
 our $VERSION = '0.09';
 
 use Moo;
-use boolean     qw( false true );
-use DBI         qw();
-use File::Slurp qw();
-use File::Spec  qw();
-use Try::Tiny   qw( catch try );
+use boolean               qw( false true );
+use DBI                   qw();
+use File::Spec            qw();
+use Path::Tiny            qw( path );
+use Try::Tiny             qw( catch try );
+use Types::Common::String qw( NonEmptyStr );
+use Types::Standard       qw( Bool Str );
+use Types::Path::Tiny     qw( Dir );
 
 use namespace::clean;
 
-has [ qw( debug dir dsn ) ]     => ( is => 'rw' );
-has [ qw( password username ) ] => ( is => 'rw', default => '' );
+has debug                       => ( is => 'rw', isa => Bool );
+has dir                         => ( is => 'rw', isa => Dir, coerce => true );
+has dsn                         => ( is => 'rw', isa => NonEmptyStr );
+has [ qw( password username ) ] => ( is => 'rw', isa => Str, default => '' );
 has dbh                         => ( is => 'lazy' );
 
 sub _build_dbh {
@@ -62,7 +67,7 @@ sub migrate {
       my $ver  = $file->{ version };
       print qq/Processing "$name"\n/ if $self->debug;
       next unless $file;
-      my $text = File::Slurp::read_file( $name );
+      my $text = path( $name )->slurp_raw;
       $text =~ s/\s*--.*$//g;
       for my $sql ( split /;/, $text ) {
         next unless $sql =~ /\w/;
@@ -122,10 +127,11 @@ sub _files {
   my ( $self, $type, $need ) = @_;
   my @files;
   for my $i ( @$need ) {
+    no warnings 'uninitialized';
     opendir( DIR, $self->dir ) or die $!;
     while ( my $file = readdir( DIR ) ) {
       next unless $file =~ /(^|\D)${i}_$type\.sql$/;
-      $file = File::Spec->catdir( $self->dir, $file );
+      $file = $self->dir->child( $file );
       push @files, { name => $file, version => $i };
     }
     closedir( DIR );

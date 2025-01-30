@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
-use Test::Fatal qw( exception );
+use Test::More tests => 18;
+use Test::Fatal qw( dies_ok exception );
 
 use DBIx::Migration;
 
@@ -10,11 +10,11 @@ eval { require DBD::SQLite };
 my $class = $@ ? 'SQLite2' : 'SQLite';
 
 like exception { DBIx::Migration->new( { dsn => "dbi:$class:dbname=./t/missing/sqlite_test" } )->version },
-  qr/unable to open database file/, 'missing database';
+  qr/unable to open database file/, 'missing database file';
 
 my $m = DBIx::Migration->new;
+dies_ok { $m->version } '"dsn" not set';
 $m->dsn( "dbi:$class:dbname=./t/sqlite_test" );
-$m->dir( './t/sql/' );
 
 ok !exists $m->{ _dbh_clone }, '_dbh_clone does not exist';
 ok !exists $m->{ dbh },        'dbh does not exist';
@@ -27,7 +27,10 @@ ok !$m->{ _dbh_clone }->{ Active }, 'disconnected';
 ok exists $m->{ dbh },  'dbh exists';
 ok $m->dbh->{ Active }, 'connected';
 
+dies_ok { $m->migrate( 1 ) } '"dir" not set';
+$m->dir( './t/sql/' );
 $m->migrate( 1 );
+
 isnt $m->{ _dbh }, $m->dbh, 'same object';
 is( $m->version, 1 );
 
