@@ -1,14 +1,15 @@
-package DBIx::Migration;
-
 use strict;
 use warnings;
+
+package DBIx::Migration;
+
+our $VERSION = '0.09';
+
 use parent qw( Class::Accessor::Fast );
 
 use DBI         qw();
 use File::Slurp qw();
 use File::Spec  qw();
-
-our $VERSION = '0.09';
 
 __PACKAGE__->mk_accessors( qw( debug dir dsn password username dbh  ) );
 
@@ -22,19 +23,17 @@ sub migrate {
   my $version = $self->_get_version_from_migration_table;
   $self->_create_migration_table, $version = 0 unless defined $version;
 
+  my @need;
+  my $type;
   if ( $wanted == $version ) {
     print "Database is already at version $wanted\n" if $self->debug;
     return 1;
-  }
-
-  # Up- or downgrade
-  my @need;
-  my $type = 'down';
-  if ( $wanted > $version ) {
+  } elsif ( $wanted > $version ) {    # upgrade
     $type = 'up';
     $version += 1;
     @need = $version .. $wanted;
-  } else {
+  } else {                            # downgrade
+    $type = 'down';
     $wanted += 1;
     @need = reverse( $wanted .. $version );
   }
@@ -64,7 +63,9 @@ sub migrate {
       if ( $self->debug && ( $wanted != $newver ) );
     return 0;
   }
+
   $self->_disconnect;
+
   return 1;
 }
 
@@ -99,12 +100,13 @@ sub _disconnect {
 
 sub _files {
   my ( $self, $type, $need ) = @_;
+
   my @files;
   for my $i ( @$need ) {
     no warnings 'uninitialized';
     opendir( DIR, $self->dir ) or die $!;
     while ( my $file = readdir( DIR ) ) {
-      next unless $file =~ /(^|\D)${i}_$type\.sql$/;
+      next unless $file =~ /(?:\A|\D)${i}_$type\.sql\z/;
       $file = File::Spec->catdir( $self->dir, $file );
       push @files, { name => $file, version => $i };
     }
@@ -115,13 +117,13 @@ sub _files {
 }
 
 sub _newest {
-  my $self   = shift;
-  my $newest = 0;
+  my $self = shift;
 
   opendir( DIR, $self->dir ) or die $!;
+  my $newest = 0;
   while ( my $file = readdir( DIR ) ) {
-    next unless $file =~ /_up\.sql$/;
-    $file =~ /\D*(\d+)_up.sql$/;
+    next unless $file =~ /_up\.sql\z/;
+    $file =~ /\D*(\d+)_up.sql\z/;
     $newest = $1 if $1 > $newest;
   }
   closedir( DIR );
@@ -135,7 +137,7 @@ sub _create_migration_table {
   $self->{ _dbh }->do( <<'EOF');
 CREATE TABLE dbix_migration ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
 EOF
-  $self->{ _dbh }->do( <<'EOF', undef, 'version', '0' );
+  $self->{ _dbh }->do( <<'EOF', undef, 'version', 0 );
 INSERT INTO dbix_migration ( name, value ) VALUES ( ?, ? );
 EOF
 }
