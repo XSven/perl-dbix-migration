@@ -5,7 +5,7 @@ use Test::More import => [ qw( is like ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 20 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 15 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -16,15 +16,8 @@ my $m = DBIx::Migration->new;
 dies_ok { $m->version } '"dsn" not set';
 $m->dsn( "dbi:SQLite:dbname=./t/sqlite_test" );
 
-ok !exists $m->{ _dbh_clone }, '_dbh_clone does not exist';
-ok !exists $m->{ dbh },        'dbh does not exist';
-
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 
-ok exists $m->{ _dbh_clone },       '_dbh_clone exists';
-ok !$m->{ _dbh_clone }->{ Active }, 'disconnected';
-
-ok exists $m->{ dbh },  'dbh exists';
 ok $m->dbh->{ Active }, 'connected';
 
 ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
