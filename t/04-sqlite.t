@@ -54,7 +54,7 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( dbh => $m->dbh );
+my $m1 = DBIx::Migration->new( { dbh => $m->dbh } );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 

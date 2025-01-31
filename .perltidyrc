@@ -8,4 +8,5 @@
 --continuation-indentation 2
 --cuddled-else
 --static-side-comments
+--noadd-semicolons
 --noblanks-before-comments

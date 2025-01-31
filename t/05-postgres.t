@@ -1,44 +1,58 @@
 use strict;
 use warnings;
 
-use Test::More;
-
-use DBIx::Migration;
+use Test::More import => [ qw( is ok plan subtest ) ];
+use Test::Fatal qw( dies_ok );
 
 eval { require Test::PostgreSQL };
-plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
+plan $@ eq '' ? ( tests => 13 ) : ( skip_all => 'Test::PostgresSQL required' );
+
+require DBIx::Migration;
 
 my $pgsql = eval { Test::PostgreSQL->new() } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
 
-plan tests => 8;
-
 my $m = DBIx::Migration->new;
+dies_ok { $m->version } '"dsn" not set';
 $m->dsn( $pgsql->dsn );
+is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
+
+ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
+
+is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
+
+dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( './t/sql/' );
 
-is( $m->version, undef );
+sub migrate_to_version_assertion {
+  my ( $version ) = @_;
+  plan tests => 2;
 
-$m->migrate( 1 );
-is( $m->version, 1 );
+  ok $m->migrate( $version ), 'migrate';
+  is $m->version, $version, 'check version';
+}
 
-$m->migrate( 2 );
-is( $m->version, 2 );
+my $target_version = 1;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$m->migrate( 1 );
-is( $m->version, 1 );
+$target_version = 2;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$m->migrate( 0 );
-is( $m->version, 0 );
+$target_version = 1;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$m->migrate( 2 );
-is( $m->version, 2 );
+$target_version = 0;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$m->migrate( 0 );
-is( $m->version, 0 );
+$target_version = 2;
+ok $m->migrate, 'migrate to newest version';
+is $m->version, $target_version, 'check version';
 
-my $m2 = DBIx::Migration->new( { dbh => $m->dbh, dir => './t/sql/' } );
+$target_version = 0;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-is( $m2->version, 0 );
+my $m1 = DBIx::Migration->new( { dbh => $m->dbh } );
+
+is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';

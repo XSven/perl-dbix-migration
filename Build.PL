@@ -25,7 +25,6 @@ my $build = Module::Build->new(
   requires => {
     'DBI'               => 1.33,    # DBI::clone() is in use
     'Moo'               => 0,
-    'Try::Tiny'         => 0,
     'Type::Tiny'        => 0,
     'Types::Path::Tiny' => 0,
     'boolean'           => 0,
