@@ -7,9 +7,9 @@ our $VERSION = '0.09';
 
 use parent qw( Class::Accessor::Fast );
 
-use DBI         qw();
-use File::Slurp qw();
-use File::Spec  qw();
+use DBI                   qw();
+use File::Slurp           qw();
+use File::Spec::Functions qw();
 
 __PACKAGE__->mk_accessors( qw( debug dir dsn password username dbh  ) );
 
@@ -26,7 +26,7 @@ sub migrate {
   my @need;
   my $type;
   if ( $wanted == $version ) {
-    print "Database is already at version $wanted\n" if $self->debug;
+    print qq/Database is already at version $wanted\n/ if $self->debug;
     return 1;
   } elsif ( $wanted > $version ) {    # upgrade
     $type = 'up';
@@ -48,7 +48,7 @@ sub migrate {
       $text =~ s/\s*--.*$//g;
       for my $sql ( split /;/, $text ) {
         next unless $sql =~ /\w/;
-        print "$sql\n" if $self->debug;
+        print qq/$sql\n/ if $self->debug;
         $self->{ _dbh }->do( $sql );
         if ( $self->{ _dbh }->err ) {
           die "Database error: " . $self->{ _dbh }->errstr;
@@ -59,7 +59,7 @@ sub migrate {
     }
   } else {
     my $newver = $self->_get_version_from_migration_table;
-    print "Database is at version $newver, couldn't migrate to $wanted\n"
+    print qq/Database is at version $newver, couldn't migrate to version $wanted\n/
       if ( $self->debug && ( $wanted != $newver ) );
     return 0;
   }
@@ -106,14 +106,15 @@ sub _files {
     no warnings 'uninitialized';
     opendir( DIR, $self->dir ) or die $!;
     while ( my $file = readdir( DIR ) ) {
-      next unless $file =~ /(?:\A|\D)${i}_$type\.sql\z/;
-      $file = File::Spec->catdir( $self->dir, $file );
+      next unless $file =~ /\D*${i}_$type\.sql\z/;
+      $file = File::Spec::Functions::catfile( $self->dir, $file );
+      print qq/Found "$file"\n/ if $self->debug;
       push @files, { name => $file, version => $i };
     }
     closedir( DIR );
   }
-  return undef unless @$need == @files;
-  return @files ? \@files : undef;
+
+  return ( @files and @$need == @files ) ? \@files : undef;
 }
 
 sub _newest {
