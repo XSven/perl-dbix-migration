@@ -1,20 +1,25 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( is like ok plan subtest ) ];
+use Test::More import => [ qw( is like note ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
+use File::Temp            qw( tempdir );
+use File::Spec::Functions qw( catfile );
+
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 15 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 16 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
-like exception { DBIx::Migration->new( { dsn => "dbi:SQLite:dbname=./t/missing/sqlite_test" } )->version },
+like exception { DBIx::Migration->new( { dsn => 'dbi:SQLite:dbname=./t/missing/test.db' } )->version },
   qr/unable to open database file/, 'missing database file';
 
 my $m = DBIx::Migration->new;
 dies_ok { $m->version } '"dsn" not set';
-$m->dsn( "dbi:SQLite:dbname=./t/sqlite_test" );
+my $tempdir = tempdir( CLEANUP => 1 );
+$m->dsn( 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );
+note 'dsn: ', $m->dsn;
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 
@@ -54,10 +59,8 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( { dbh => $m->dbh } );
+my $m1 = DBIx::Migration->new( { dbh => $m->dbh, dir => $m->dir, debug => 1 } );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 
-END {
-  unlink './t/sqlite_test';
-}
+ok ! $m1->migrate( 3 ), 'sql up migration file is missing';

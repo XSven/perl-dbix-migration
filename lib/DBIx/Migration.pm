@@ -46,7 +46,7 @@ sub migrate {
   my @need;
   my $type;
   if ( $wanted == $version ) {
-    print STDERR "Database is already at version $wanted\n" if $self->debug;
+    print STDERR qq/Database is already at version $wanted\n/ if $self->debug;
     return true
   } elsif ( $wanted > $version ) {    # upgrade
     $type = 'up';
@@ -79,7 +79,7 @@ sub migrate {
     }
   } else {
     my $newver = $self->_get_version_from_migration_table;
-    print STDERR "Database is at version $newver, couldn't migrate to $wanted\n"
+    print STDERR qq/Database is at version $newver, couldn't migrate to version $wanted\n/
       if ( $self->debug && ( $wanted != $newver ) );
     return false
   }
@@ -106,13 +106,13 @@ sub _files {
     no warnings 'uninitialized';
     $self->dir->visit(
       sub {
-        return unless m/(?:\A|\D)${i}_$type\.sql\z/;
+        return unless m/\D*${i}_$type\.sql\z/;
+        print STDERR qq/Found "$_"\n/ if $self->debug;
         push @files, { name => $_, version => $i }
       }
     )
   }
-  return undef unless @$need == @files;
-  return @files ? \@files : undef
+  ( @files and @$need == @files ) ? \@files : undef
 }
 
 sub _newest_version {

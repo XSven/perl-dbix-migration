@@ -5,7 +5,7 @@ use Test::More import => [ qw( is ok plan subtest ) ];
 use Test::Fatal qw( dies_ok );
 
 eval { require Test::PostgreSQL };
-plan $@ eq '' ? ( tests => 13 ) : ( skip_all => 'Test::PostgresSQL required' );
+plan $@ eq '' ? ( tests => 14 ) : ( skip_all => 'Test::PostgresSQL required' );
 
 require DBIx::Migration;
 
@@ -53,6 +53,8 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( { dbh => $m->dbh } );
+my $m1 = DBIx::Migration->new( { dbh => $m->dbh, dir => $m->dir } );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
+
+ok ! $m1->migrate( 3 ), 'sql up migration file is missing';
