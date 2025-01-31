@@ -5,7 +5,7 @@ use Test::More import => [ qw( is ok plan subtest ) ];
 use Test::Fatal qw( dies_ok );
 
 eval { require Test::PostgreSQL };
-plan $@ eq '' ? ( tests => 11 ) : ( skip_all => 'Test::PostgresSQL required' );
+plan $@ eq '' ? ( tests => 13 ) : ( skip_all => 'Test::PostgresSQL required' );
 
 require DBIx::Migration;
 
@@ -18,6 +18,11 @@ my $m = DBIx::Migration->new;
 dies_ok { $m->version } '"dsn" not set';
 $m->dsn( $pgsql->dsn );
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
+
+ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
+
+is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
+
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( './t/sql/' );
 

@@ -14,17 +14,17 @@ __PACKAGE__->mk_accessors( qw( debug dir dsn password username dbh  ) );
 
 sub migrate {
   my ( $self, $wanted ) = @_;
+
   $self->_connect;
+
   $wanted = $self->_newest unless defined $wanted;
+
   my $version = $self->_get_version_from_migration_table;
-  if ( defined $version && ( $wanted == $version ) ) {
+  $self->_create_migration_table, $version = 0 unless defined $version;
+
+  if ( $wanted == $version ) {
     print "Database is already at version $wanted\n" if $self->debug;
     return 1;
-  }
-
-  unless ( defined $version ) {
-    $self->_create_migration_table;
-    $version = 0;
   }
 
   # Up- or downgrade
