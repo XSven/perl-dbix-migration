@@ -12,9 +12,14 @@ script/dbix-migration.pl
 t/01-load.t
 t/04-sqlite.t
 t/05-postgres.t
-t/06-pod.t
+t/06-postgres-trigger.t
 t/07-podcoverage.t
+t/08-pod.t
 t/sql/2_up.sql
 t/sql/schema_1_down.sql
 t/sql/schema_1_up.sql
 t/sql/schema_2_down.sql
+t/trigger/schema_1_down.sql
+t/trigger/schema_1_up.sql
+t/trigger/schema_2_down.sql
+t/trigger/schema_2_up.sql
