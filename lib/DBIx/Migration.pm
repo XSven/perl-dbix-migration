@@ -101,6 +101,7 @@ sub _files {
   my ( $self, $type, $need ) = @_;
   my @files;
   for my $i ( @$need ) {
+    no warnings 'uninitialized';
     opendir( DIR, $self->dir ) or die $!;
     while ( my $file = readdir( DIR ) ) {
       next unless $file =~ /(^|\D)${i}_$type\.sql$/;

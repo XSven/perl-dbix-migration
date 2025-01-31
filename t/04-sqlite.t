@@ -1,42 +1,60 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
-
-use DBIx::Migration;
+use Test::More import => [ qw( is like ok plan subtest ) ];
+use Test::Fatal qw( dies_ok exception );
 
 eval { require DBD::SQLite };
-my $class = $@ ? 'SQLite2' : 'SQLite';
+plan $@ eq '' ? ( tests => 12 ) : ( skip_all => 'DBD::SQLite required' );
 
-eval { DBIx::Migration->new( { dsn => "dbi:$class:dbname=./t/missing/sqlite_test" } )->version };
-ok( $@ =~ /^Couldn't connect to database/ );
+require DBIx::Migration;
+
+like exception { DBIx::Migration->new( { dsn => 'dbi:SQLite:dbname=./t/missing/sqlite_test' } )->version },
+  qr/unable to open database file/, 'missing database file';
 
 my $m = DBIx::Migration->new;
-$m->dsn( "dbi:$class:dbname=./t/sqlite_test" );
+dies_ok { $m->version } '"dsn" not set';
+$m->dsn( 'dbi:SQLite:dbname=./t/sqlite_test' );
+
+is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
+
+#ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
+
+#is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
+
+dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( './t/sql/' );
-is( $m->version, undef );
 
-$m->migrate( 1 );
-is( $m->version, 1 );
+sub migrate_to_version_assertion {
+  my ( $version ) = @_;
+  plan tests => 2;
 
-$m->migrate( 2 );
-is( $m->version, 2 );
+  ok $m->migrate( $version ), 'migrate';
+  is $m->version, $version, 'check version';
+}
 
-$m->migrate( 1 );
-is( $m->version, 1 );
+my $target_version = 1;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$m->migrate( 0 );
-is( $m->version, 0 );
+$target_version = 2;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$m->migrate( 2 );
-is( $m->version, 2 );
+$target_version = 1;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$m->migrate( 0 );
-is( $m->version, 0 );
+$target_version = 0;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m2 = DBIx::Migration->new( { dbh => $m->dbh, dir => './t/sql/' } );
+$target_version = 2;
+ok $m->migrate, 'migrate to newest version';
+is $m->version, $target_version, 'check version';
 
-is( $m2->version, 0 );
+$target_version = 0;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+
+my $m1 = DBIx::Migration->new( { dbh => $m->dbh } );
+
+is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 
 END {
   unlink './t/sqlite_test';
