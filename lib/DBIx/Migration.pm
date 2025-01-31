@@ -16,7 +16,7 @@ sub migrate {
   my ( $self, $wanted ) = @_;
   $self->_connect;
   $wanted = $self->_newest unless defined $wanted;
-  my $version = $self->_version;
+  my $version = $self->_get_version_from_migration_table;
   if ( defined $version && ( $wanted == $version ) ) {
     print "Database is already at version $wanted\n" if $self->debug;
     return 1;
@@ -59,7 +59,7 @@ sub migrate {
       $self->_update_migration_table( $ver );
     }
   } else {
-    my $newver = $self->_version;
+    my $newver = $self->_get_version_from_migration_table;
     print "Database is at version $newver, couldn't migrate to $wanted\n"
       if ( $self->debug && ( $wanted != $newver ) );
     return 0;
@@ -71,7 +71,7 @@ sub migrate {
 sub version {
   my $self = shift;
   $self->_connect;
-  my $version = $self->_version;
+  my $version = $self->_get_version_from_migration_table;
   $self->_disconnect;
   return $version;
 }
@@ -90,19 +90,6 @@ sub _connect {
     }
   ) or die sprintf( qq/Couldn't connect to database %s: %s/, $self->dsn, $DBI::errstr );
   $self->dbh( $self->{ _dbh } );
-}
-
-sub _create_migration_table {
-  my $self = shift;
-  $self->{ _dbh }->do( <<"EOF");
-CREATE TABLE dbix_migration (
-    name VARCHAR(64) PRIMARY KEY,
-    value VARCHAR(64)
-);
-EOF
-  $self->{ _dbh }->do( <<"EOF");
-    INSERT INTO dbix_migration ( name, value ) VALUES ( 'version', '0' );
-EOF
 }
 
 sub _disconnect {
@@ -141,26 +128,39 @@ sub _newest {
   return $newest;
 }
 
-sub _update_migration_table {
-  my ( $self, $version ) = @_;
-  $self->{ _dbh }->do( <<"EOF");
-UPDATE dbix_migration SET value = '$version' WHERE name = 'version';
+sub _create_migration_table {
+  my $self = shift;
+
+  $self->{ _dbh }->do( <<'EOF');
+CREATE TABLE dbix_migration ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
+EOF
+  $self->{ _dbh }->do( <<'EOF', undef, 'version', '0' );
+INSERT INTO dbix_migration ( name, value ) VALUES ( ?, ? );
 EOF
 }
 
-sub _version {
-  my $self    = shift;
-  my $version = undef;
+sub _update_migration_table {
+  my ( $self, $version ) = @_;
+
+  $self->{ _dbh }->do( <<'EOF', undef, $version, 'version' );
+UPDATE dbix_migration SET value = ? WHERE name = ?;
+EOF
+}
+
+sub _get_version_from_migration_table {
+  my $self = shift;
+
   eval {
-    my $sth = $self->{ _dbh }->prepare( <<"EOF");
+    my $sth = $self->{ _dbh }->prepare( <<'EOF');
 SELECT value FROM dbix_migration WHERE name = ?;
 EOF
     $sth->execute( 'version' );
+    my $version = undef;
     for my $val ( $sth->fetchrow_arrayref ) {
       $version = $val->[ 0 ];
     }
+    $version;
   };
-  return $version;
 }
 
 1;
