@@ -4,6 +4,8 @@ use warnings;
 use Test::More import => [ qw( is ok plan subtest ) ];
 use Test::Fatal qw( dies_ok );
 
+use Path::Tiny qw( cwd );
+
 eval { require Test::PostgreSQL };
 plan $@ eq '' ? ( tests => 14 ) : ( skip_all => 'Test::PostgresSQL required' );
 
@@ -24,7 +26,7 @@ ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist ye
 is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
-$m->dir( './t/sql/' );
+$m->dir( cwd->child( qw( t sql ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
@@ -57,4 +59,4 @@ my $m1 = DBIx::Migration->new( { dbh => $m->dbh, dir => $m->dir } );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 
-ok ! $m1->migrate( 3 ), 'sql up migration file is missing';
+ok !$m1->migrate( 3 ), 'sql up migration file is missing';
