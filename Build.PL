@@ -16,6 +16,7 @@ my $build = Module::Build->new(
     'Test::API'        => 0,
     'Test::Deep'       => 0,
     'Test::Fatal'      => 0,
+    'Test::More'       => 1.001005,
     'Test::PostgreSQL' => 0
   },
   recommends => {
