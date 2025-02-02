@@ -4,6 +4,9 @@ author:
   - 'Sebastian Riedel, <kraihx@gmail.com>'
 build_requires:
   DBD::SQLite: '0'
+  Test::API: '0'
+  Test::Fatal: '0'
+  Test::More: '1.001005'
   Test::PostgreSQL: '0'
 configure_requires:
   CPAN::Meta::Converter: '2.15'
@@ -28,6 +31,7 @@ requires:
   DBI: '1.33'
   File::Slurp: '0'
   File::Spec: '0'
+  perl: v5.8.9
 resources:
   bugtracker: https://github.com/XSven/perl-dbix-migration/issues
   license: http://dev.perl.org/licenses/

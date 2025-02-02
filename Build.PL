@@ -24,9 +24,10 @@ my $build = Module::Build->new(
     'Test::Pod::Coverage' => 1.04
   },
   requires => {
+    'perl'                  => '5.8.9',
     'File::Slurp'           => 0,
     'File::Spec'            => 0,
-    'DBI'                   => 1.33,    # DBI::clone() is in use
+    'DBI'                   => 1.33,      # DBI::clone() is in use
     'Class::Accessor::Fast' => 0
   },
   create_readme => 1,

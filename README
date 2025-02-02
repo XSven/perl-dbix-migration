@@ -2,34 +2,39 @@ NAME
     DBIx::Migration - Seamless DB schema up- and downgrades
 
 SYNOPSIS
-        # migrate.pl
-        my $m = DBIx::Migration->new(
-            {
-                dsn => 'dbi:SQLite:/Users/sri/myapp/db/sqlite/myapp.db',
-                dir => '/Users/sri/myapp/db/sqlite'
-            }
-        );
+      my $m = DBIx::Migration->new(
+          {
+              dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
+              dir => '~/Projects/myapp/db/migrations'
+          }
+      );
 
-        my $version = $m->version;   # Get current version from database
-        $m->migrate( 2 );            # Migrate database to version 2
+      # Get current version from database
+      my $version = $m->version;
 
-        # /Users/sri/myapp/db/sqlite/schema_1_up.sql
-        CREATE TABLE foo (
-            id INTEGER PRIMARY KEY,
-            bar TEXT
-        );
+      # Migrate database to version 1
+      $m->migrate( 1 );
 
-        # /Users/sri/myapp/db/sqlite/schema_1_down.sql
-        DROP TABLE foo;
+      # Migrate database to the newest/highest version
+      $m->migrate;
 
-        # /Users/sri/myapp/db/sqlite/schema_2_up.sql
-        CREATE TABLE bar (
-            id INTEGER PRIMARY KEY,
-            baz TEXT
-        );
+      # ~/Projects/myapp/db/migrations/schema_1_up.sql
+      CREATE TABLE foo (
+          id INTEGER PRIMARY KEY,
+          bar TEXT
+      );
 
-        # /Users/sri/myapp/db/sqlite/schema_2_down.sql
-        DROP TABLE bar;
+      # ~/Projects/myapp/db/migrations/schema_1_down.sql
+      DROP TABLE foo;
+
+      # ~/Projects/myapp/db/migrations/schema_2_up.sql
+      CREATE TABLE bar (
+          id INTEGER PRIMARY KEY,
+          baz TEXT
+      );
+
+      # ~/Projects/myapp/db/migrations/schema_2_down.sql
+      DROP TABLE bar;
 
 DESCRIPTION
     Seamless DB schema up- and downgrades.
@@ -48,7 +53,8 @@ METHODS
         Get/Set dbh.
 
     $self->migrate( $version )
-        Migrate database to version.
+        Migrate database to version. Returns true in case of success;
+        otherwise false.
 
     $self->password
         Get/Set database password.
