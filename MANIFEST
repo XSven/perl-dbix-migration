@@ -14,7 +14,7 @@ t/02-pod.t
 t/03-podcoverage.t
 t/04-sqlite.t
 t/05-postgres.t
-t/sql/sqlite_1_down.sql
-t/sql/sqlite_1_up.sql
-t/sql/sqlite_2_down.sql
+t/sql/schema_1_down.sql
+t/sql/schema_1_up.sql
+t/sql/schema_2_down.sql
 t/sql/2_up.sql
