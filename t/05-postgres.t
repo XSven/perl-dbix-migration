@@ -5,14 +5,16 @@ use Test::More import => [ qw( is ok plan subtest ) ];
 use Test::Fatal qw( dies_ok );
 
 eval { require Test::PostgreSQL };
-plan $@ eq '' ? ( tests => 14 ) : ( skip_all => 'Test::PostgresSQL required' );
-
-require DBIx::Migration;
+plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
 
 my $pgsql = eval { Test::PostgreSQL->new() } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
+
+plan tests => 14;
+
+require DBIx::Migration;
 
 my $m = DBIx::Migration->new;
 dies_ok { $m->version } '"dsn" not set';
