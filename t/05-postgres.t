@@ -4,6 +4,8 @@ use warnings;
 use Test::More import => [ qw( is ok plan subtest ) ];
 use Test::Fatal qw( dies_ok );
 
+use File::Spec::Functions qw( catdir curdir );
+
 eval { require Test::PostgreSQL };
 plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
 
@@ -26,7 +28,7 @@ ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist ye
 is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
-$m->dir( './t/sql/' );
+$m->dir( catdir( curdir, qw( t sql ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

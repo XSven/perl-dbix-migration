@@ -5,7 +5,7 @@ use Test::More import => [ qw( is like note ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
 use File::Temp            qw( tempdir );
-use File::Spec::Functions qw( catfile );
+use File::Spec::Functions qw( catdir catfile curdir );
 
 eval { require DBD::SQLite };
 plan $@ eq '' ? ( tests => 15 ) : ( skip_all => 'DBD::SQLite required' );
@@ -28,7 +28,7 @@ ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist ye
 is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
-$m->dir( './t/sql/' );
+$m->dir( catdir( curdir, qw( t sql ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
@@ -61,4 +61,4 @@ my $m1 = DBIx::Migration->new( { dbh => $m->dbh, dir => $m->dir, debug => 1 } );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 
-ok ! $m1->migrate( 3 ), 'sql up migration file is missing';
+ok !$m1->migrate( 3 ), 'sql up migration file is missing';
