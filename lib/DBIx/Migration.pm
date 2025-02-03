@@ -51,7 +51,7 @@ sub migrate {
         print qq/$sql\n/ if $self->debug;
         $self->{ _dbh }->do( $sql );
         if ( $self->{ _dbh }->err ) {
-          die "Database error: " . $self->{ _dbh }->errstr;
+          die sprintf( qq/SQL error when reading file '%s': %s/, $name, $self->{ _dbh }->errstr );
         }
       }
       $ver -= 1 if ( ( $ver > 0 ) && ( $type eq 'down' ) );
@@ -89,7 +89,7 @@ sub _connect {
       PrintError => 0,
       AutoCommit => 1
     }
-  ) or die sprintf( qq/Couldn't connect to database %s: %s/, $self->dsn, $DBI::errstr );
+  ) or die sprintf( qq/Cannot connect to database '%s': %s/, $self->dsn, $DBI::errstr );
   $self->dbh( $self->{ _dbh } );
 }
 
@@ -104,14 +104,15 @@ sub _files {
   my @files;
   for my $i ( @$need ) {
     no warnings 'uninitialized';
-    opendir( DIR, $self->dir ) or die $!;
-    while ( my $file = readdir( DIR ) ) {
+    opendir( my $dh, $self->dir )
+      or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
+    while ( my $file = readdir( $dh ) ) {
       next unless $file =~ /\D*${i}_$type\.sql\z/;
       $file = File::Spec::Functions::catfile( $self->dir, $file );
       print qq/Found "$file"\n/ if $self->debug;
       push @files, { name => $file, version => $i };
     }
-    closedir( DIR );
+    closedir( $dh );
   }
 
   return ( @files and @$need == @files ) ? \@files : undef;
@@ -120,14 +121,15 @@ sub _files {
 sub _newest {
   my $self = shift;
 
-  opendir( DIR, $self->dir ) or die $!;
+  opendir( my $dh, $self->dir )
+    or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
   my $newest = 0;
-  while ( my $file = readdir( DIR ) ) {
+  while ( my $file = readdir( $dh ) ) {
     next unless $file =~ /_up\.sql\z/;
     $file =~ /\D*(\d+)_up.sql\z/;
     $newest = $1 if $1 > $newest;
   }
-  closedir( DIR );
+  closedir( $dh );
 
   return $newest;
 }

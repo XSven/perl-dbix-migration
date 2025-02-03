@@ -15,7 +15,7 @@ my $build = Module::Build->new(
     'DBD::SQLite'      => 0,
     'Test::API'        => 0,
     'Test::Fatal'      => 0,
-    'Test::More'       => 1.001005,
+    'Test::More'       => 1.001005,    # Subtests accept args
     'Test::PostgreSQL' => 0
   },
   recommends => {
