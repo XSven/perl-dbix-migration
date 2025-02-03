@@ -14,7 +14,13 @@ t/02-pod.t
 t/03-podcoverage.t
 t/04-sqlite.t
 t/05-postgres.t
+t/06-postgres-trigger.t
+t/lib/Test/PgTAP.pm
+t/sql/2_up.sql
 t/sql/schema_1_down.sql
 t/sql/schema_1_up.sql
 t/sql/schema_2_down.sql
-t/sql/2_up.sql
+t/trigger/schema_1_down.sql
+t/trigger/schema_1_up.sql
+t/trigger/schema_2_down.sql
+t/trigger/schema_2_up.sql
