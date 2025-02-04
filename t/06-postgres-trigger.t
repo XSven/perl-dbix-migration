@@ -27,7 +27,7 @@ plan tests => 3;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new( { dsn => $pgsql->dsn, dir => catdir( curdir, qw( t trigger ) ), debug => 0 } );
+my $m = DBIx::Migration->new( { dsn => $pgsql->dsn, dir => catdir( curdir, qw( t sql trigger ) ), debug => 0 } );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

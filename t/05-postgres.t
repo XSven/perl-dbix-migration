@@ -41,7 +41,7 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
 };
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
-$m->dir( catdir( curdir, qw( t sql ) ) );
+$m->dir( catdir( curdir, qw( t sql basic ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
