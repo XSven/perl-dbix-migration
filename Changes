@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Use bind parameters consistently
         - Don't use bareword directory handles
         - Fix to version 0 migrate
+        - Use transactions
         - Update documentation
 
 0.09 Wed Jan 29 09:09:14 CET 2025

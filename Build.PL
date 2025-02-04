@@ -26,10 +26,11 @@ my $build = Module::Build->new(
   },
   requires => {
     'perl'                  => '5.8.9',
+    'Class::Accessor::Fast' => 0,
+    'DBI'                   => 1.33,      # DBI::clone() is in use
     'File::Slurp'           => 0,
     'File::Spec'            => 0,
-    'DBI'                   => 1.33,      # DBI::clone() is in use
-    'Class::Accessor::Fast' => 0
+    'Try::Tiny'             => 0
   },
   create_readme => 1,
   script_files  => [ glob( 'script/*' ) ],
