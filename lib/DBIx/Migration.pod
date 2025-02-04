@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-DBIx::Migration - Seamless DB schema up- and downgrades
+DBIx::Migration - Seamless database schema up- and downgrades
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,13 @@ DBIx::Migration - Seamless DB schema up- and downgrades
 
 =head1 DESCRIPTION
 
-Seamless DB schema up- and downgrades.
+This module provides seamless database schema up- and downgrades. The
+implementation is based on migrations. A migration is a ".sql" script.
+Although not mandatory the script name begins with a prefix like for example
+"schema_". It follows a version number that is a non-negative integer. After an
+underscore "_" the script name ends with the migration type that is either "up"
+or "down". Migrations are stored in a directory and are applied in order to a
+database.
 
 =head1 METHODS
 
@@ -54,21 +60,23 @@ Enable/Disable debug messages.
 
 =item $self->dir( $dir )
 
-Get/Set directory.
+Get/Set directory that contains migrations.
 
 =item $self->dsn( $dsn )
 
 Get/Set dsn.
 
-=item $self->dbh( $dsn )
+=item $self->dbh( $dbh )
 
 Get/Set dbh.
 
 =item $self->migrate( $version )
 
 Migrate database to version. Returns true in case of success; otherwise false.
+If called without the version argument the newest migration version will be
+used.
 
-=item $self->password
+=item $self->password( $password )
 
 Get/Set database password.
 
@@ -82,6 +90,13 @@ Get migration version from database. Will be undef if no migration has taken
 place yet.
 
 =back
+
+=head1 CAVEATS
+
+After the C<dbh> was used for the first time changing the C<dsn>, C<password>,
+or C<username> has no impact. The reason is the mutable (offering setter
+methods) design of this module. Changing this will break the backwards
+compatibility.
 
 =head1 AUTHOR
 

@@ -11,7 +11,35 @@ use DBI                   qw();
 use File::Slurp           qw();
 use File::Spec::Functions qw();
 
-__PACKAGE__->mk_accessors( qw( debug dir dsn password username dbh  ) );
+__PACKAGE__->mk_accessors( qw( debug dir dsn password username ) );
+
+sub dbh {
+  my $self = shift;
+
+  if ( @_ ) {
+    $self->{ dbh } = $_[ 0 ];
+  }
+  unless( defined $self->{ dbh } ) {
+    $self->{ dbh } = $self->_build_dbh;
+  }
+
+  return $self->{ dbh }
+}
+
+sub _build_dbh {
+  my $self = shift;
+
+  return DBI->connect(
+    $self->dsn,
+    $self->username,
+    $self->password,
+    {
+      RaiseError => 1,
+      PrintError => 0,
+      AutoCommit => 1
+    }
+  );
+}
 
 sub migrate {
   my ( $self, $wanted ) = @_;
@@ -79,18 +107,7 @@ sub version {
 
 sub _connect {
   my $self = shift;
-  return $self->{ _dbh } = $self->dbh->clone( {} ) if $self->dbh;
-  $self->{ _dbh } = DBI->connect(
-    $self->dsn,
-    $self->username,
-    $self->password,
-    {
-      RaiseError => 0,
-      PrintError => 0,
-      AutoCommit => 1
-    }
-  ) or die sprintf( qq/Cannot connect to database '%s': %s/, $self->dsn, $DBI::errstr );
-  $self->dbh( $self->{ _dbh } );
+  $self->{ _dbh } = $self->dbh->clone( {} );
 }
 
 sub _disconnect {

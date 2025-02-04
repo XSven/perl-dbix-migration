@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( is like note ok plan subtest ) ];
+use Test::More import => [ qw( is is_deeply like note ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
 use File::Temp            qw( tempdir );
 use File::Spec::Functions qw( catdir catfile curdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 15 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 16 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -17,15 +17,22 @@ like exception { DBIx::Migration->new( { dsn => 'dbi:SQLite:dbname=./t/missing/t
 
 my $m = DBIx::Migration->new;
 dies_ok { $m->version } '"dsn" not set';
+
 my $tempdir = tempdir( CLEANUP => 1 );
 $m->dsn( 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );
 note 'dsn: ', $m->dsn;
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
+ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
 
 ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
 
-is $m->version, 0, 'privious migrate() has triggered the "dbix_migration" table creation';
+subtest 'privious migrate() has triggered the "dbix_migration" table creation' => sub {
+  plan tests => 2;
+
+  is $m->version, 0, 'check version';
+  is_deeply [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ '"main"."dbix_migration"' ], 'check tables';
+};
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( catdir( curdir, qw( t sql ) ) );

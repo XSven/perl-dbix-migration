@@ -1,5 +1,5 @@
 {
-   "abstract" : "Seamless DB schema up- and downgrades",
+   "abstract" : "Seamless database schema up- and downgrades",
    "author" : [
       "Sebastian Riedel, <kraihx@gmail.com>"
    ],
@@ -38,6 +38,7 @@
          "requires" : {
             "DBD::SQLite" : "0",
             "Test::API" : "0",
+            "Test::Deep" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "1.001005",
             "Test::PostgreSQL" : "0"

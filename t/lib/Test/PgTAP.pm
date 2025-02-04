@@ -8,7 +8,6 @@ our $VERSION = '0.001';
 use parent qw( Test::Builder::Module );
 
 use Test::Deep qw( bag deep_diag cmp_details );
-use DBI        qw();
 
 our @EXPORT = qw( tables_are );
 # the idea how to inject a database handle was borrowed from
