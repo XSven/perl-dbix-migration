@@ -3,7 +3,7 @@ use warnings;
 
 package DBIx::Migration;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use parent qw( Class::Accessor::Fast );
 
@@ -77,17 +77,16 @@ sub migrate {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
         print qq/Processing "$name"\n/ if $self->debug;
-        next unless $file;
         my $text = File::Slurp::read_file( $name );
         $text =~ s/\s*--.*$//g;
         # https://docs.liquibase.com/change-types/enddelimiter-sql.html
         for my $sql ( split /;/, $text ) {
+          $sql =~ s/\A\s*//;
           next unless $sql =~ /\w/;
           print qq/$sql\n/ if $self->debug;
+          # prepend $sql to error message
+          local $self->{ _dbh }->{ HandleError } = sub { $_[ 0 ] = "$sql\n$_[0]"; return 0; };
           $self->{ _dbh }->do( $sql );
-          if ( $self->{ _dbh }->err ) {
-            die sprintf( qq/SQL error when reading file '%s': %s/, $name, $self->{ _dbh }->errstr );
-          }
         }
         $ver -= 1 if ( ( $ver > 0 ) && ( $type eq 'down' ) );
         $self->_update_migration_table( $ver );

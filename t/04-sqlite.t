@@ -8,7 +8,7 @@ use File::Temp            qw( tempdir );
 use File::Spec::Functions qw( catdir catfile curdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 16 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 18 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -69,3 +69,16 @@ my $m1 = DBIx::Migration->new( { dbh => $m->dbh, dir => $m->dir, debug => 0 } );
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 
 ok !$m1->migrate( 3 ), 'return false because sql up migration file is missing';
+
+$tempdir = tempdir( CLEANUP => 1 );
+my $m2 = DBIx::Migration->new(
+  {
+    dsn   => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ),
+    dir   => catdir( curdir, qw( t sql rollback ) ),
+    debug => 0
+  }
+);
+
+dies_ok { $m2->migrate } 'second migration section is broken';
+is_deeply [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [],
+  'check tables: creation of dbix_migartion table was rolled back too!';

@@ -45,10 +45,15 @@ DBIx::Migration - Seamless database schema up- and downgrades
 This module provides seamless database schema up- and downgrades. The
 implementation is based on migrations. A migration is a ".sql" script.
 Although not mandatory the script name begins with a prefix like for example
-"schema_". It follows a version number that is a non-negative integer. After an
+"schema_". It follows a version number that is a positive integer. After an
 underscore "_" the script name ends with the migration type that is either "up"
 or "down". Migrations are stored in a directory and are applied in order to a
-database.
+database. Usually the version number of the first migration is 1. The version
+numbers of the other migrations have to be ascending without gaps. During
+processing the content of each migration is read with the C<binmode> of C<:raw>
+into a scalar. The content is split into sections using the default SQL
+delimiter ";". Each section is executed independently. All related sections are
+encapsulated in a database transaction.
 
 =head1 METHODS
 
