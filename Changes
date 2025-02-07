@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
 
 ?.?? Fri Feb  7 11:27:41 CET 2025
         - Change the object system
+        - Fix removal of SQL comments
 
 0.10 Fri Feb  7 10:11:04 CET 2025
         - Add API test

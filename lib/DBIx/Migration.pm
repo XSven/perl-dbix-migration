@@ -78,7 +78,7 @@ sub migrate {
         my $ver  = $file->{ version };
         print qq/Processing "$name"\n/ if $self->debug;
         my $text = File::Slurp::read_file( $name );
-        $text =~ s/\s*--.*$//g;
+        $text =~ s/\s*--.*$//mg;
         # https://docs.liquibase.com/change-types/enddelimiter-sql.html
         for my $sql ( split /;/, $text ) {
           $sql =~ s/\A\s*//;
