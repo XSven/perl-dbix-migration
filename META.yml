@@ -22,7 +22,7 @@ name: DBIx-Migration
 provides:
   DBIx::Migration:
     file: lib/DBIx/Migration.pm
-    version: '0.09'
+    version: '0.10'
 recommends:
   Test::Needs: '0'
   Test::Pod: '1.26'
