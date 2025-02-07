@@ -65,6 +65,6 @@
          "url" : "git://github.com/XSven/perl-dbix-migration.git"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
