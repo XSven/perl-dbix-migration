@@ -5,14 +5,14 @@ package DBIx::Migration;
 
 our $VERSION = '0.10';
 
-use parent qw( Class::Accessor::Fast );
+use subs 'dbh';
+
+use Class::Tiny qw( debug dbh dir dsn password username );
 
 use DBI                   qw();
 use File::Slurp           qw();
 use File::Spec::Functions qw();
 use Try::Tiny             qw();
-
-__PACKAGE__->mk_accessors( qw( debug dir dsn password username ) );
 
 sub dbh {
   my $self = shift;

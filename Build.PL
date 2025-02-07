@@ -25,12 +25,12 @@ my $build = Module::Build->new(
     'Test::Pod::Coverage' => 1.04
   },
   requires => {
-    'perl'                  => '5.8.9',
-    'Class::Accessor::Fast' => 0,
-    'DBI'                   => 1.33,      # DBI::clone() is in use
-    'File::Slurp'           => 0,
-    'File::Spec'            => 0,
-    'Try::Tiny'             => 0
+    'perl'        => '5.8.9',
+    'Class::Tiny' => 0,
+    'DBI'         => 1.33,             # DBI::clone() is in use
+    'File::Slurp' => 0,
+    'File::Spec'  => 0,
+    'Try::Tiny'   => 0
   },
   create_readme => 1,
   script_files  => [ glob( 'script/*' ) ],

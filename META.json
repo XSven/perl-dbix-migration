@@ -27,7 +27,7 @@
             "Test::Pod::Coverage" : "1.04"
          },
          "requires" : {
-            "Class::Accessor::Fast" : "0",
+            "Class::Tiny" : "0",
             "DBI" : "1.33",
             "File::Slurp" : "0",
             "File::Spec" : "0",

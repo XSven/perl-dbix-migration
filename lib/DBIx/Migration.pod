@@ -7,10 +7,8 @@ DBIx::Migration - Seamless database schema up- and downgrades
 =head1 SYNOPSIS
 
   my $m = DBIx::Migration->new(
-      {
-          dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
-          dir => '~/Projects/myapp/db/migrations'
-      }
+    dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
+    dir => '~/Projects/myapp/db/migrations'
   );
 
   # Get current version from database

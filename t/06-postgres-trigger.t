@@ -16,7 +16,7 @@ use DBI::Const::GetInfoType qw( %GetInfoType );
 eval { require Test::PostgreSQL };
 plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
 
-my $pgsql = eval { Test::PostgreSQL->new() } or do {
+my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
@@ -27,7 +27,7 @@ plan tests => 3;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new( { dsn => $pgsql->dsn, dir => catdir( curdir, qw( t sql trigger ) ), debug => 0 } );
+my $m = DBIx::Migration->new( dsn => $pgsql->dsn, dir => catdir( curdir, qw( t sql trigger ) ), debug => 0 );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
