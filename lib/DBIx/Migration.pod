@@ -101,6 +101,16 @@ or C<username> has no impact. The reason is the mutable (offering setter
 methods) design of this module. Changing this will break the backwards
 compatibility.
 
+=head1 SEE ALSO
+
+=over
+
+=item * L<Liquibase endDelimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
+
+=item * L<Using pgTAP|https://pgtap.org/documentation.html#usingpgtap>
+
+=back
+
 =head1 AUTHOR
 
 Sebastian Riedel, <kraihx@gmail.com>

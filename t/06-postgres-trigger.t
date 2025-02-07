@@ -23,11 +23,11 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
 note 'dsn: ', $pgsql->dsn;
 local $Test::PgTAP::Dbh = DBI->connect( $pgsql->dsn );
 
-plan tests => 3;
+plan tests => 5;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new( dsn => $pgsql->dsn, dir => catdir( curdir, qw( t sql trigger ) ), debug => 0 );
+my $m = DBIx::Migration->new( dsn => $pgsql->dsn, dir => catdir( curdir, qw( t sql trigger ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
@@ -43,3 +43,8 @@ subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, 
 # these are the same assertions that should test tables_are
 tables_are 'public', [ qw( dbix_migration products ) ], 'Check tables';
 tables_are [ qw( dbix_migration products ) ];
+
+$m->debug( 1 );
+$target_version = 2;
+subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+tables_are [ qw( dbix_migration products product_price_changes ) ];
