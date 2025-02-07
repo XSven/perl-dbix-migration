@@ -1,4 +1,4 @@
--- some usual comment
+-- dbix_migration_delimiter:/ bar
 CREATE TABLE product_price_changes (
   id INT GENERATED ALWAYS AS IDENTITY,
   product_id INT NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE product_price_changes (
   changed_on TIMESTAMP(6) NOT NULL
 );
 /
- -- foo dbix_migration_delimiter:/ bar
+-- some usual comment
 CREATE OR REPLACE FUNCTION log_price_changes()
   RETURNS TRIGGER 
   LANGUAGE PLPGSQL

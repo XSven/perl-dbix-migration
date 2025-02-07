@@ -77,8 +77,8 @@ sub migrate {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
         print qq/Processing "$name"\n/ if $self->debug;
-        my $text = File::Slurp::read_file( $name );
-        my $delimiter = ( $text =~ m/--.*dbix_migration_delimiter:\s*(\S+)/ ) ? $1 : ';';
+        my $text      = File::Slurp::read_file( $name );
+        my $delimiter = ( $text =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
         print qq/Delimiter is $delimiter\n/ if $self->debug;
         $text =~ s/\s*--.*$//mg;
         for my $sql ( split /$delimiter/, $text ) {
