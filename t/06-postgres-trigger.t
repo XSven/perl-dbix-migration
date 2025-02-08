@@ -48,7 +48,7 @@ $target_version = 2;
 subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 tables_are 'myschema', [ qw( products product_price_changes ) ], 'Check tables';
 tables_are [ qw( public.dbix_migration myschema.products myschema.product_price_changes ) ];
-triggers_are 'products', [ qw( price_changes ) ];
+triggers_are 'myschema', 'products', [ qw( price_changes ) ];
 
 subtest 'check that the trigger does work' => sub {
   plan tests => 3;
