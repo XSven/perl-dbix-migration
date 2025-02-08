@@ -37,7 +37,7 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
   plan tests => 2;
 
   is $m->version, 0, 'check version';
-  tables_are [ 'dbix_migration' ], 'check tables';
+  tables_are [ 'public.dbix_migration' ], 'check tables';
 };
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
