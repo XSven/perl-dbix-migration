@@ -1,6 +1,6 @@
 -- dbix_migration_delimiter:/ bar
 CREATE TABLE myschema.product_price_changes (
-  id INT GENERATED ALWAYS AS IDENTITY,
+  id SERIAL,
   product_id INT NOT NULL,
   old_price NUMERIC(10,2) NOT NULL,
   new_price NUMERIC(10,2) NOT NULL,
