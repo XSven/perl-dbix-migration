@@ -121,8 +121,6 @@ compatibility.
 
 =item * L<Liquibase endDelimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
-=item * L<Using pgTAP|https://pgtap.org/documentation.html#usingpgtap>
-
 =back
 
 =head1 AUTHOR

@@ -24,7 +24,7 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
 note 'dsn: ', $pgsql->dsn;
 local $Test::PgTAP::Dbh = DBI->connect( $pgsql->dsn );
 
-plan tests => 8;
+plan tests => 9;
 
 require DBIx::Migration;
 
@@ -49,6 +49,7 @@ subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, 
 tables_are 'myschema', [ qw( products product_price_changes ) ], 'Check tables';
 tables_are [ qw( public.dbix_migration myschema.products myschema.product_price_changes ) ];
 triggers_are 'myschema', 'products', [ qw( price_changes ) ];
+triggers_are 'products', [ qw( myschema.price_changes ) ];
 
 subtest 'check that the trigger does work' => sub {
   plan tests => 3;
