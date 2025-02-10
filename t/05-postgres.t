@@ -10,7 +10,7 @@ use Test::Fatal qw( dies_ok );
 use Test::PgTAP import => [ qw( tables_are ) ];
 
 eval { require Test::PostgreSQL };
-plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
+plan skip_all => 'Test::PostgreSQL required' unless $@ eq '';
 
 my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';

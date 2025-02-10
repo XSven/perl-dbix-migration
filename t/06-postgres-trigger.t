@@ -15,7 +15,7 @@ use DBI                     qw();
 use DBI::Const::GetInfoType qw( %GetInfoType );
 
 eval { require Test::PostgreSQL };
-plan skip_all => 'Test::PostgresSQL required' unless $@ eq '';
+plan skip_all => 'Test::PostgreSQL required' unless $@ eq '';
 
 my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
