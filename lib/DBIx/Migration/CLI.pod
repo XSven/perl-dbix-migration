@@ -38,11 +38,11 @@ dbix-migration - Seamless database up- and downgrades
 
 =over
 
-=item I<dsn>
+=item I<dsn> Data source name.
 
-=item I<directory>
+=item I<directory> Directory that contains the migrations.
 
-=item I<version>
+=item I<version> Version to migrate to. If not specified the newest migration will be taken.
 
 =back
 
@@ -50,9 +50,9 @@ dbix-migration - Seamless database up- and downgrades
 
 =over
 
-=item run
+=item run()
 
-Executes.
+Executes this script.
 
 =back
 
@@ -63,6 +63,10 @@ L<DBIx::Migration>
 =head1 AUTHOR
 
 Sebastian Riedel, <kraihx@gmail.com>
+
+=head1 CONTRIBUTORS
+
+Sven Willenbuecher, <sven.willenbuecher@gmx.de>
 
 =head1 COPYRIGHT
 

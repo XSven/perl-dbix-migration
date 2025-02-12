@@ -10,6 +10,7 @@ our $VERSION = '0.11';
 use DBIx::Migration ();
 use Getopt::Std     qw( getopts );
 use POSIX           qw( EXIT_FAILURE EXIT_SUCCESS );
+use Try::Tiny       qw( catch try );
 
 sub run {
   local @ARGV = @_;
@@ -34,30 +35,36 @@ sub run {
 
   return _usage( -exitval => 2, -message => 'Missing mandatory arguments' ) unless @ARGV;
 
-  my $dsn = shift;
+  $exitval = try {
+    my $dsn = shift @ARGV;
+    if ( @ARGV ) {
+      my $dir = shift @ARGV;
+      my $m   = DBIx::Migration->new(
+        debug    => $opts->{ v },
+        dsn      => $dsn,
+        dir      => $dir,
+        password => $opts->{ p },
+        username => $opts->{ u }
+      );
 
-  if ( @ARGV ) {
-    my $dir = shift;
-    my $m   = DBIx::Migration->new(
-      debug    => $opts->{ v },
-      dsn      => $dsn,
-      dir      => $dir,
-      password => $opts->{ p },
-      username => $opts->{ u }
-    );
+      return ( $m->migrate( $ARGV[ 2 ] ) ? EXIT_SUCCESS : EXIT_FAILURE );
+    } else {
+      my $m = DBIx::Migration->new(
+        debug    => $opts->{ v },
+        dsn      => $dsn,
+        password => $opts->{ p },
+        username => $opts->{ u }
+      );
+      my $version = $m->version;
+      print STDOUT $version if defined $version;
+      return EXIT_SUCCESS;
+    }
+  } catch {
+    chomp;
+    return _usage( -exitval => 2, -message => $_ );
+  };
 
-    return ( $m->migrate( $ARGV[ 2 ] ) ? EXIT_SUCCESS : EXIT_FAILURE );
-  } else {
-    my $m = DBIx::Migration->new(
-      debug    => $opts->{ v },
-      dsn      => $dsn,
-      password => $opts->{ p },
-      username => $opts->{ u }
-    );
-    my $version = $m->version;
-    print STDOUT $version if defined $version;
-    return EXIT_SUCCESS;
-  }
+  return $exitval;
 }
 
 sub _usage {

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is ok plan subtest use_ok ) ], tests => 6;
+use Test::More import => [ qw( BAIL_OUT is ok plan subtest use_ok ) ], tests => 7;
 use Test::Output qw( stderr_like stdout_is stdout_like );
 use POSIX        qw( EXIT_FAILURE EXIT_SUCCESS );
 
@@ -40,5 +40,13 @@ subtest 'unknown option' => sub {
   plan tests => 2;
 
   stderr_like { $got_exitval = $coderef->( '-g' ) } qr/\AUnknown option: g\nUsage:.+/s, 'check stderr';
+  is $got_exitval, 2, 'check exit value';
+};
+
+subtest 'missing database file' => sub {
+  plan tests => 2;
+
+  stderr_like { $got_exitval = $coderef->( 'dbi:SQLite:dbname=./t/missing/test.db' ) }
+  qr/unable to open database file.+\nUsage:.+/s, 'check stderr';
   is $got_exitval, 2, 'check exit value';
 };

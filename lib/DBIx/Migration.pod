@@ -68,7 +68,7 @@ previous example it is the "/" (slash) character.
 
 =head1 METHODS
 
-=over 4
+=over
 
 =item $self->debug( $debug )
 
