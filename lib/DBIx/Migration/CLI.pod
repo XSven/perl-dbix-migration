@@ -1,0 +1,74 @@
+=pod
+
+=head1 NAME
+
+dbix-migration - Seamless database up- and downgrades
+
+=head1 VERSION
+
+0.11
+
+=head1 SYNOPSIS
+
+=over
+
+=item dbix-migration [ B<-V> | B<-h> ]
+
+=item dbix-migration [ B<-v> ] [ B<-u> I<username> ] [ B<-p> I<password> ] I<dsn> [ I<directory> [ I<version> ] ]
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<-V> Print version information and exit.
+
+=item B<-h> Print help message and exit.
+
+=item B<-v> Print verbose information.
+
+=item B<-u> I<username> Set database username.
+
+=item B<-p> I<password> Set database password.
+
+=back
+
+=head1 ARGUMENTS
+
+=over
+
+=item I<dsn>
+
+=item I<directory>
+
+=item I<version>
+
+=back
+
+=head1 METHODS
+
+=over
+
+=item run
+
+Executes.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIx::Migration>
+
+=head1 AUTHOR
+
+Sebastian Riedel, <kraihx@gmail.com>
+
+=head1 COPYRIGHT
+
+Copyright 2004-2005 Sebastian Riedel. All rights reserved.
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
