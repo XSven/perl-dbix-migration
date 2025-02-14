@@ -42,7 +42,7 @@ dbix-migration - Seamless database up- and downgrades
 
 =item I<directory> Directory that contains the migrations.
 
-=item I<version> Version to migrate to. If not specified the newest migration will be taken.
+=item I<version> Version to migrate to. If not specified the latest migration will be taken.
 
 =back
 

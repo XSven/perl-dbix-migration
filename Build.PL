@@ -33,7 +33,7 @@ my $build = Module::Build->new(
     'File::Slurp' => 0,
     'File::Spec'  => 0,
     'Pod::Find'   => 0,
-    'Pod::Usage'  => 0,
+    'Pod::Usage'  => 1.64,
     'Try::Tiny'   => 0
   },
   create_readme => 1,

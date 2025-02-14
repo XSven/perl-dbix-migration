@@ -47,7 +47,7 @@ sub run {
         username => $opts->{ u }
       );
 
-      return ( $m->migrate( $ARGV[ 2 ] ) ? EXIT_SUCCESS : EXIT_FAILURE );
+      return ( $m->migrate( shift @ARGV ) ? EXIT_SUCCESS : EXIT_FAILURE );
     } else {
       my $m = DBIx::Migration->new(
         debug    => $opts->{ v },
@@ -56,7 +56,10 @@ sub run {
         username => $opts->{ u }
       );
       my $version = $m->version;
-      print STDOUT $version if defined $version;
+      # FIXME:
+      # The debug/verbose output is sent to stdout too. This should urgently
+      # changed: debug/verbose output should go to stderr!
+      print STDOUT ( defined $version ? $version : '' );
       return EXIT_SUCCESS;
     }
   } catch {

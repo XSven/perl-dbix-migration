@@ -17,7 +17,7 @@ DBIx::Migration - Seamless database schema up- and downgrades
   # Migrate database to version 1
   $m->migrate( 1 );
 
-  # Migrate database to the newest/highest version
+  # Migrate database to the latest version
   $m->migrate;
 
   # ~/Projects/myapp/db/migrations/schema_1_up.sql
@@ -89,7 +89,7 @@ Get/Set dbh.
 =item $self->migrate( $version )
 
 Migrate database to version. Returns true in case of success; otherwise false.
-If called without the version argument the newest migration version will be
+If called without the version argument the latest migration version will be
 used.
 
 =item $self->password( $password )
