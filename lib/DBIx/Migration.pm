@@ -3,7 +3,7 @@ use warnings;
 
 package DBIx::Migration;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use subs 'dbh';
 
