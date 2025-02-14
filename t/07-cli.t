@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is ok plan subtest use_ok ) ], tests => 12;
+use Test::More import => [ qw( BAIL_OUT is ok plan subtest use_ok ) ], tests => 13;
 use Test::Output qw( stderr_like stdout_is stdout_like );
 
 use File::Temp            qw( tempdir);
@@ -68,11 +68,11 @@ subtest 'version is undefined' => sub {
   is $got_exitval, 0, 'check exit value';
 };
 
+  my $dir = catdir( curdir, qw( t sql basic ) );
 subtest 'migrate to version 0' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  my $dir = catdir( curdir, qw( t sql basic ) );
   stdout_is { $got_exitval = $coderef->( $dsn, $dir, 0 ) } '', 'check stdout';
   is $got_exitval, 0, 'check exit value';
 };
@@ -89,7 +89,6 @@ subtest 'migrate to latest version' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  my $dir = catdir( curdir, qw( t sql basic ) );
   stdout_is { $got_exitval = $coderef->( $dsn, $dir ) } '', 'check stdout';
   is $got_exitval, 0, 'check exit value';
 };
@@ -100,4 +99,12 @@ subtest 'version is latest' => sub {
   my $got_exitval;
   stdout_is { $got_exitval = $coderef->( $dsn ) } '2', 'check stdout';
   is $got_exitval, 0, 'check exit value';
+};
+
+subtest 'migrate to missing version' => sub {
+  plan tests => 2;
+
+  my $got_exitval;
+  stdout_is { $got_exitval = $coderef->( $dsn, $dir, 3 ) } '', 'check stdout';
+  is $got_exitval, 1, 'check exit value';
 };

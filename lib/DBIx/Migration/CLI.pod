@@ -18,13 +18,20 @@ dbix-migration - Seamless database up- and downgrades
 
 =back
 
+=head1 DESCRIPTION
+
+This script prints the current migration version if invoked with the I<dsn>
+argument only. The script applies the migrations up to the given target
+I<version> if the I<direction> and I<version> arguments are specified too. If
+the I<version> is missing the latest migration version will be used.
+
 =head1 OPTIONS
 
 =over
 
 =item B<-V> Print version information and exit.
 
-=item B<-h> Print help message and exit.
+=item B<-h> Print long help message and exit.
 
 =item B<-v> Print verbose information.
 
