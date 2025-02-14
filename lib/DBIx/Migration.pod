@@ -123,6 +123,23 @@ compatibility.
 
 =back
 
+=head1 TODOS
+
+=over
+
+=item *
+
+Make the C<DBIx::Migration> class immutable (get rid of setters). It is
+unclear how to handle C<$dir>. This change would break the backwards
+compatibility.
+
+=item *
+
+Implement proper logging. Printing debug information to stdout conflicts with
+the stdout output of C<DBIx::Migration::CLI>.
+
+=back
+
 =head1 AUTHOR
 
 Sebastian Riedel, <kraihx@gmail.com>
