@@ -8,7 +8,7 @@ my $build = Module::Build->new(
   license            => 'perl',
   module_name        => 'DBIx::Migration',
   configure_requires => {
-    'CPAN::Meta::Converter' => 2.15,
+    'CPAN::Meta::Converter' => 2.150010,
     'Module::Build'         => 0.42
   },
   test_requires => {
