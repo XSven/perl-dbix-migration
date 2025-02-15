@@ -22,8 +22,8 @@ DBIx::Migration - Seamless database schema up- and downgrades
 
   # ~/Projects/myapp/db/migrations/schema_1_up.sql
   CREATE TABLE foo (
-      id INTEGER PRIMARY KEY,
-      bar TEXT
+    id INTEGER PRIMARY KEY,
+    bar TEXT
   );
 
   # ~/Projects/myapp/db/migrations/schema_1_down.sql
@@ -31,8 +31,8 @@ DBIx::Migration - Seamless database schema up- and downgrades
 
   # ~/Projects/myapp/db/migrations/schema_2_up.sql
   CREATE TABLE bar (
-      id INTEGER PRIMARY KEY,
-      baz TEXT
+    id INTEGER PRIMARY KEY,
+    baz TEXT
   );
 
   # ~/Projects/myapp/db/migrations/schema_2_down.sql
