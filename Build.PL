@@ -36,10 +36,11 @@ my $build = Module::Build->new(
     'Pod::Usage'  => 1.64,
     'Try::Tiny'   => 0
   },
-  create_readme => 1,
-  script_files  => [ glob( 'script/*' ) ],
-  test_files    => [ glob( 't/*.t' ) ],
-  meta_merge    => {
+  create_readme  => 1,
+  script_files   => [ glob( 'script/*' ) ],
+  test_files     => [ glob( 't/*.t' ) ],
+  add_to_cleanup => [ 'cover_db/*' ],
+  meta_merge     => {
     'meta-spec' => {
       version => 2
     },
