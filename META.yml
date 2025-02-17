@@ -13,6 +13,8 @@ build_requires:
   Test::PostgreSQL: '0'
 configure_requires:
   CPAN::Meta::Converter: '2.15001'
+  CPAN::Meta::YAML: '0.02'
+  JSON::PP: '4.16'
   Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
@@ -36,10 +38,12 @@ requires:
   DBI: '1.33'
   File::Slurp: '0'
   File::Spec: '0'
-  Object::Tiny: '0'
+  Moo: '0'
+  MooX::SetOnce: '0'
   Pod::Find: '0'
   Pod::Usage: '1.64'
   Try::Tiny: '0'
+  namespace::clean: '0'
   perl: v5.8.9
 resources:
   bugtracker: https://github.com/XSven/perl-dbix-migration/issues

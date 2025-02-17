@@ -11,4 +11,6 @@ BEGIN {
   use_ok( $module ) or BAIL_OUT "Cannot load module '$module'!";
 }
 
-class_api_ok( $module, qw( new dir debug dbh dsn username password migrate version ) );
+# "before" should not be part of the API:
+# https://github.com/haarg/MooX-SetOnce/issues/2
+class_api_ok( $module, qw( before new dir debug dbh dsn username password migrate version ) );

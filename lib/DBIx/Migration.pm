@@ -5,41 +5,20 @@ package DBIx::Migration;
 
 our $VERSION = '0.12';
 
-use subs qw( _confessf );
-
-#use Class::Tiny qw( debug dbh dir dsn password username );
-use Object::Tiny qw( debug dbh dir dsn password username );
+use Moo;
+use MooX::SetOnce;
 
 use DBI                   qw();
 use File::Slurp           qw();
 use File::Spec::Functions qw();
 use Try::Tiny             qw();
 
-{
-  no warnings 'redefine';
+use namespace::clean -except => [ qw( before ) ];
 
-  sub dbh {
-    my $self = shift;
-
-    unless ( defined $self->{ dbh } ) {
-      $self->{ dbh } = $self->_build_dbh;
-    }
-
-    return $self->{ dbh };
-  }
-
-  sub dir {
-    my $self = shift;
-
-    if ( @_ ) {
-      _confessf "'%s' is a set-once attribute", 'dir'
-        if exists $self->{ dir };
-      $self->{ dir } = $_[ 0 ];
-    }
-
-    return $self->{ dir };
-  }
-}
+has dbh                             => ( is => 'lazy' );
+has debug                           => ( is => 'rw' );
+has dir                             => ( is => 'rw', once => 1 );
+has [ qw( dsn password username ) ] => ( is => 'ro' );
 
 sub _build_dbh {
   my $self = shift;
@@ -199,12 +178,6 @@ sub _update_migration_table {
   $self->{ _dbh }->do( <<'EOF', undef, $version, 'version' );
 UPDATE dbix_migration SET value = ? WHERE name = ?;
 EOF
-}
-
-sub _confessf ( $@ ) {
-  require Carp;
-  @_ = ( ( $#_ == 0 ? shift : sprintf shift, @_ ) . ', stopped' );
-  goto &Carp::confess;
 }
 
 1;

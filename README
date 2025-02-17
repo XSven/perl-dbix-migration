@@ -97,20 +97,13 @@ METHODS
         "dbix_migration". The name of this table may change in the future so
         don't rely on it.
 
-CAVEATS
-    After the "dbh" was used for the first time changing the "dsn",
-    "password", or "username" has no impact. The reason is the mutable
-    (offering setter methods) design of this module. Changing this will
-    break the backwards compatibility.
-
 SEE ALSO
     *   Liquibase endDelimiter
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
 TODOS
-    *   Make the "DBIx::Migration" class immutable (get rid of setters). It
-        is unclear how to handle $dir. This change would break the backwards
-        compatibility.
+    *   Supply properly overloaded constructor "new()": It should not be
+        possible to set "dsn" and "dbh" at the same time.
 
     *   Implement proper logging. Printing debug information to stdout
         conflicts with the stdout output of "DBIx::Migration::CLI".
