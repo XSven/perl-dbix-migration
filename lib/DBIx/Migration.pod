@@ -6,13 +6,17 @@ DBIx::Migration - Seamless database schema up- and downgrades
 
 =head1 SYNOPSIS
 
+  use DBIx::Migration ();
+
   my $m = DBIx::Migration->new(
-    dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
-    dir => '~/Projects/myapp/db/migrations'
+    dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db'
   );
 
   # Get current version from database
   my $version = $m->version;
+
+  # Set directory before applying migrations
+  $m->dir( '~/Projects/myapp/db/migrations' );
 
   # Migrate database to version 1
   $m->migrate( 1 );
@@ -41,17 +45,18 @@ DBIx::Migration - Seamless database schema up- and downgrades
 =head1 DESCRIPTION
 
 This module provides seamless database schema up- and downgrades. The
-implementation is based on migrations. A migration is a ".sql" script.
+implementation is based on migrations. A migration is a C<.sql> script.
 Although not mandatory the script name begins with a prefix like for example
-"schema_". It follows a version number that is a positive integer. After an
-underscore "_" the script name ends with the migration type that is either "up"
-or "down". Migrations are stored in a directory and are applied in order to a
-database. Usually the version number of the first migration is 1. The version
-numbers of the other migrations have to be ascending without gaps.
+C<schema_>. It follows a version number that is a positive integer. After an
+C<_> (underscore) character the script name ends with the migration type that
+is either C<up> or C<down>. Migrations are stored in a directory and are
+applied in order to a database. Usually the version number of the first
+migration is 1. The version numbers of the other migrations have to be
+ascending without gaps.
 
 During processing the content of each migration is read with the C<binmode> of
 C<:raw> into a scalar. The content is split into sections using the default SQL
-delimiter ";" (semicolon). Each section is executed independently. All related
+delimiter C<;> (semicolon). Each section is executed independently. All related
 sections are encapsulated in a database transaction.  If a migration embeds
 stored logic containing one or more semicolons (a PostgreSQL trigger function
 for example), the C<migrate()> method incorrectly splits the migration into
@@ -64,7 +69,7 @@ the migration
 
 The annotation has to be specified in the first line. The delimiter has to be
 a single printable ASCII character, excluding the space character. In the
-previous example it is the "/" (slash) character.
+previous example it is the C</> (slash) character.
 
 =head1 METHODS
 
@@ -102,8 +107,8 @@ Get/Set database username.
 
 =item $self->version
 
-Get migration version from database. Will be undef if no migration has taken
-place yet. The version is stored in the table B<dbix_migration>. The name of
+Get migration version from database. Will be C<undef> if no migration has taken
+place yet. The version is stored in the table C<dbix_migration>. The name of
 this table may change in the future so don't rely on it.
 
 =back
