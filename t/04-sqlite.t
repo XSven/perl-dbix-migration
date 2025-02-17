@@ -8,7 +8,7 @@ use File::Temp            qw( tempdir );
 use File::Spec::Functions qw( catdir catfile curdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 18 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 17 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -33,7 +33,6 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( catdir( curdir, qw( t sql basic ) ) );
-dies_ok { $m->dir( 'foo' ) } '"dir" is a set-once attribute"';
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

@@ -3,7 +3,7 @@ use warnings;
 
 package DBIx::Migration;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Moo;
 use MooX::SetOnce;
@@ -33,6 +33,22 @@ sub _build_dbh {
       AutoCommit => 1    # see below "begin_work" based transaction handling
     }
   );
+}
+
+sub BUILD {
+  my ( $self, $args ) = @_;
+
+  if ( exists $args->{ dsn } ) {
+    die 'dsn and dbh cannot be used at the same time'
+      if exists $args->{ dbh };
+  } elsif ( exists $args->{ dbh } ) {
+    foreach ( qw( dsn username password ) ) {
+      die "dbh and $_ cannot be used at the same time"
+        if exists $args->{ $_ };
+    }
+  } else {
+    die 'both dsn and dbh are not set';
+  }
 }
 
 sub migrate {

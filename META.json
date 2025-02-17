@@ -57,11 +57,11 @@
    "provides" : {
       "DBIx::Migration" : {
          "file" : "lib/DBIx/Migration.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "DBIx::Migration::CLI" : {
          "file" : "lib/DBIx/Migration/CLI.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "url" : "git://github.com/XSven/perl-dbix-migration.git"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

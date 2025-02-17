@@ -68,6 +68,9 @@ DESCRIPTION
     In the previous example it is the "/" (slash) character.
 
 METHODS
+    $self->BUILD( $args )
+        Validate object.
+
     $self->debug( $debug )
         Enable/disable debug messages.
 
@@ -102,9 +105,6 @@ SEE ALSO
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
 TODOS
-    *   Supply properly overloaded constructor "new()": It should not be
-        possible to set "dsn" and "dbh" at the same time.
-
     *   Implement proper logging. Printing debug information to stdout
         conflicts with the stdout output of "DBIx::Migration::CLI".
 

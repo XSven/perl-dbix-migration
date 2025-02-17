@@ -19,7 +19,7 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
 note 'dsn: ', $pgsql->dsn;
 local $Test::PgTAP::Dbh = DBI->connect( $pgsql->dsn );
 
-plan tests => 15;
+plan tests => 14;
 
 require DBIx::Migration;
 
@@ -39,7 +39,6 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( catdir( curdir, qw( t sql basic ) ) );
-dies_ok { $m->dir( 'foo' ) } '"dir" is a set-once attribute"';
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

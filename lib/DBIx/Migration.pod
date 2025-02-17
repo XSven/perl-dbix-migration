@@ -75,6 +75,10 @@ previous example it is the C</> (slash) character.
 
 =over
 
+=item $self->BUILD( $args )
+
+Validate object.
+
 =item $self->debug( $debug )
 
 Enable/disable debug messages.
@@ -124,11 +128,6 @@ this table may change in the future so don't rely on it.
 =head1 TODOS
 
 =over
-
-=item *
-
-Supply properly overloaded constructor C<new()>: It should not be possible to
-set C<dsn> and C<dbh> at the same time.
 
 =item *
 
