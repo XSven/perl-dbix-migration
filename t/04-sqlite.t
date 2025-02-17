@@ -15,11 +15,8 @@ require DBIx::Migration;
 like exception { DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=./t/missing/test.db' )->version },
   qr/unable to open database file/, 'missing database file';
 
-my $m = DBIx::Migration->new;
-dies_ok { $m->version } '"dsn" not set';
-
 my $tempdir = tempdir( CLEANUP => 1 );
-$m->dsn( 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );
+my $m       = DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );
 note 'dsn: ', $m->dsn;
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
@@ -36,6 +33,7 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( catdir( curdir, qw( t sql basic ) ) );
+dies_ok { $m->dir( 'foo' ) } '"dir" is a set-once attribute"';
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Use EXECUTE PROCEDURE instead of EXECUTE FUNCTION in PostgreSQL
           related trigger test to make CPAN testers happy
         - Fix version information
+        - Again change the object system
 
 0.12 Fri Feb 14 10:34:02 CET 2025
         - Improve internal Test::PgTAP test functions

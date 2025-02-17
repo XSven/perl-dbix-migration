@@ -23,10 +23,7 @@ plan tests => 15;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new;
-dies_ok { $m->version } '"dsn" not set';
-
-$m->dsn( $pgsql->dsn );
+my $m = DBIx::Migration->new(dsn => $pgsql->dsn );
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
@@ -42,6 +39,7 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
 $m->dir( catdir( curdir, qw( t sql basic ) ) );
+dies_ok { $m->dir( 'foo' ) } '"dir" is a set-once attribute"';
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

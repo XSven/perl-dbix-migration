@@ -77,19 +77,19 @@ previous example it is the C</> (slash) character.
 
 =item $self->debug( $debug )
 
-Enable/Disable debug messages.
+Enable/disable debug messages.
 
 =item $self->dir( $dir )
 
-Get/Set directory that contains migrations.
+Get/set-once directory that contains migrations.
 
-=item $self->dsn( $dsn )
+=item $self->dsn
 
-Get/Set dsn.
+Get data source name.
 
-=item $self->dbh( $dbh )
+=item $self->dbh
 
-Get/Set dbh.
+Get database handle.
 
 =item $self->migrate( $version )
 
@@ -97,13 +97,13 @@ Migrate database to version. Returns true in case of success; otherwise false.
 If called without the version argument the latest migration version will be
 used.
 
-=item $self->password( $password )
+=item $self->password
 
-Get/Set database password.
+Get database password.
 
-=item $self->username( $username )
+=item $self->username
 
-Get/Set database username.
+Get database username.
 
 =item $self->version
 
@@ -112,13 +112,6 @@ place yet. The version is stored in the table C<dbix_migration>. The name of
 this table may change in the future so don't rely on it.
 
 =back
-
-=head1 CAVEATS
-
-After the C<dbh> was used for the first time changing the C<dsn>, C<password>,
-or C<username> has no impact. The reason is the mutable (offering setter
-methods) design of this module. Changing this will break the backwards
-compatibility.
 
 =head1 SEE ALSO
 
@@ -134,9 +127,8 @@ compatibility.
 
 =item *
 
-Make the C<DBIx::Migration> class immutable (get rid of setters). It is
-unclear how to handle C<$dir>. This change would break the backwards
-compatibility.
+Supply properly overloaded constructor C<new()>: It should not be possible to
+set C<dsn> and C<dbh> at the same time.
 
 =item *
 
