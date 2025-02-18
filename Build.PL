@@ -33,6 +33,7 @@ my $build = Module::Build->new(
     'DBI'                     => 1.33,      # DBI::clone() is in use
     'File::Slurp'             => 0,
     'File::Spec'              => 0,
+    'Log::Any'                => 0,
     'Moo'                     => 0,
     'MooX::SetOnce'           => 0,
     'MooX::StrictConstructor' => 0,

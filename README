@@ -88,9 +88,6 @@ METHODS
     $self->BUILD( $args )
         Validate object.
 
-    $self->debug( $debug )
-        Enable/disable debug messages.
-
     $self->dir( $dir )
         Get/set-once directory that contains migrations.
 
@@ -122,16 +119,19 @@ METHODS
         Get migration version from database. Will be "undef" if no migration
         has taken place yet. The version is stored in the tracking table.
 
+LOGGING
+    The logging of this class is based on a static Log::Any logger. Its
+    category is the class name itself. The easiest way to enable logging is
+    to set the "LOG_ANY_DEFAULT_ADAPTER" environment variable:
+
+      LOG_ANY_DEFAULT_ADAPTER=Stderr
+
 SEE ALSO
     *   Liquibase endDelimiter
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
     *   Liquibase tracking schema
         <https://docs.liquibase.com/parameters/liquibase-schema-name.html>
-
-TODOS
-    *   Implement proper logging. Printing debug information to stdout
-        conflicts with the stdout output of "DBIx::Migration::CLI".
 
 AUTHOR
     Sebastian Riedel, <kraihx@gmail.com>

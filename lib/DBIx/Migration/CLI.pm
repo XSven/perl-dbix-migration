@@ -7,10 +7,11 @@ package DBIx::Migration::CLI;
 
 our $VERSION = '0.13';
 
-use DBIx::Migration ();
-use Getopt::Std     qw( getopts );
-use POSIX           qw( EXIT_FAILURE EXIT_SUCCESS );
-use Try::Tiny       qw( catch try );
+use DBIx::Migration   ();
+use Getopt::Std       qw( getopts );
+use Log::Any::Adapter ();
+use POSIX             qw( EXIT_FAILURE EXIT_SUCCESS );
+use Try::Tiny         qw( catch try );
 
 sub run {
   local @ARGV = @_;
@@ -36,11 +37,11 @@ sub run {
   return _usage( -exitval => 2, -message => 'Missing mandatory arguments' ) unless @ARGV;
 
   $exitval = try {
+    Log::Any::Adapter->set( { category => 'DBIx::Migration' }, 'Stderr' ) if exists $opts->{ v };
     my $dsn = shift @ARGV;
     if ( @ARGV ) {
       my $dir = shift @ARGV;
       my $m   = DBIx::Migration->new(
-        debug    => $opts->{ v },
         dsn      => $dsn,
         dir      => $dir,
         password => $opts->{ p },
@@ -51,16 +52,12 @@ sub run {
       return ( $m->migrate( shift @ARGV ) ? EXIT_SUCCESS : EXIT_FAILURE );
     } else {
       my $m = DBIx::Migration->new(
-        debug           => $opts->{ v },
-        dsn             => $dsn,
-        password        => $opts->{ p },
-        username        => $opts->{ u },
+        dsn      => $dsn,
+        password => $opts->{ p },
+        username => $opts->{ u },
         exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
       );
       my $version = $m->version;
-      # FIXME:
-      # The debug/verbose output is sent to stdout too. This should urgently
-      # changed: debug/verbose output should go to stderr!
       print STDOUT ( defined $version ? $version : '' );
       return EXIT_SUCCESS;
     }

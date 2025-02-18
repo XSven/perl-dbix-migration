@@ -98,10 +98,6 @@ default to the C<public> tracking schema.
 
 Validate object.
 
-=item $self->debug( $debug )
-
-Enable/disable debug messages.
-
 =item $self->dir( $dir )
 
 Get/set-once directory that contains migrations.
@@ -144,6 +140,14 @@ place yet. The version is stored in the tracking table.
 
 =back
 
+=head1 LOGGING
+
+The logging of this class is based on a static L<Log::Any> logger. Its category
+is the class name itself. The easiest way to enable logging is to set the
+C<LOG_ANY_DEFAULT_ADAPTER> environment variable:
+
+  LOG_ANY_DEFAULT_ADAPTER=Stderr
+
 =head1 SEE ALSO
 
 =over
@@ -151,17 +155,6 @@ place yet. The version is stored in the tracking table.
 =item * L<Liquibase endDelimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
 =item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
-
-=back
-
-=head1 TODOS
-
-=over
-
-=item *
-
-Implement proper logging. Printing debug information to stdout conflicts with
-the stdout output of C<DBIx::Migration::CLI>.
 
 =back
 

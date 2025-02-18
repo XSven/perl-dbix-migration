@@ -32,6 +32,7 @@
             "DBI" : "1.33",
             "File::Slurp" : "0",
             "File::Spec" : "0",
+            "Log::Any" : "0",
             "Moo" : "0",
             "MooX::SetOnce" : "0",
             "MooX::StrictConstructor" : "0",
