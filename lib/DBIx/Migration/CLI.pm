@@ -23,7 +23,7 @@ sub run {
       chomp $warning;
       $exitval = _usage( -exitval => 2, -message => $warning );
     };
-    getopts( '-Vhp:u:v', $opts = {} );
+    getopts( '-Vhp:s:u:v', $opts = {} );
   }
   return $exitval if defined $exitval;
 
@@ -44,16 +44,18 @@ sub run {
         dsn      => $dsn,
         dir      => $dir,
         password => $opts->{ p },
-        username => $opts->{ u }
+        username => $opts->{ u },
+        exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
       );
 
       return ( $m->migrate( shift @ARGV ) ? EXIT_SUCCESS : EXIT_FAILURE );
     } else {
       my $m = DBIx::Migration->new(
-        debug    => $opts->{ v },
-        dsn      => $dsn,
-        password => $opts->{ p },
-        username => $opts->{ u }
+        debug           => $opts->{ v },
+        dsn             => $dsn,
+        password        => $opts->{ p },
+        username        => $opts->{ u },
+        exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
       );
       my $version = $m->version;
       # FIXME:

@@ -14,7 +14,7 @@ dbix-migration - Seamless database up- and downgrades
 
 =item dbix-migration [ B<-V> | B<-h> ]
 
-=item dbix-migration [ B<-v> ] [ B<-u> I<username> ] [ B<-p> I<password> ] I<dsn> [ I<directory> [ I<version> ] ]
+=item dbix-migration [ B<-v> ] [ B<-u> I<username> ] [ B<-p> I<password> ] [ B<-s> I<schema> ] I<dsn> [ I<directory> [ I<version> ] ]
 
 =back
 
@@ -38,6 +38,8 @@ the I<version> is missing the latest migration version will be used.
 =item B<-u> I<username> Set database username.
 
 =item B<-p> I<password> Set database password.
+
+=item B<-s> I<schema> Set tracking schema.
 
 =back
 
