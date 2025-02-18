@@ -21,8 +21,9 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
-note 'managed schema: ', my $managed_schema = 'myschema';
-note 'dsn: ',            my $dsn            = $pgsql->dsn . ";options=--search_path=$managed_schema";
+note 'tracking schema: ', my $tracking_schema = 'public';
+note 'managed schema: ',  my $managed_schema  = 'myschema';
+note 'dsn: ',             my $dsn             = $pgsql->dsn . ";options=--search_path=$managed_schema";
 local $Test::PgTAP::Dbh = DBI->connect( $dsn );
 
 plan tests => 9;
@@ -43,12 +44,12 @@ my $target_version = 1;
 subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
 tables_are $managed_schema, [ qw( products ) ], 'Check tables';
-tables_are [ 'public.dbix_migration', "$managed_schema.products" ];
+tables_are [ "$tracking_schema.dbix_migration", "$managed_schema.products" ];
 
 $target_version = 2;
 subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 tables_are $managed_schema, [ qw( products product_price_changes ) ], 'Check tables';
-tables_are [ 'public.dbix_migration', map { "$managed_schema.$_" } qw( products product_price_changes ) ];
+tables_are [ "$tracking_schema.dbix_migration", map { "$managed_schema.$_" } qw( products product_price_changes ) ];
 triggers_are $managed_schema, 'products', [ qw( price_changes ) ];
 triggers_are 'products', [ "$managed_schema.price_changes" ];
 
