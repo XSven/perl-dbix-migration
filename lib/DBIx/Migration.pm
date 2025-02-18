@@ -6,17 +6,19 @@ use Moo;
 use MooX::SetOnce;
 use MooX::StrictConstructor;
 
-use DBI                   ();
-use File::Slurp           qw( read_file );
-use File::Spec::Functions qw( catfile );
-use Try::Tiny             qw( catch try );
+use DBI                     ();
+use DBI::Const::GetInfoType qw( %GetInfoType );
+use File::Slurp             qw( read_file );
+use File::Spec::Functions   qw( catfile );
+use Try::Tiny               qw( catch try );
 
 use namespace::clean -except => [ qw( before new ) ];
 
-has dbh                             => ( is => 'lazy' );
-has debug                           => ( is => 'rw' );
-has dir                             => ( is => 'rw', once => 1 );
-has [ qw( dsn password username ) ] => ( is => 'ro' );
+has [ qw( dbh dsn tracking_schema ) ] => ( is => 'lazy' );
+has tracking_table                    => ( is => 'lazy', init_arg => undef );
+has debug                             => ( is => 'rw' );
+has dir                               => ( is => 'rw', once => 1 );
+has [ qw( password username ) ]       => ( is => 'ro' );
 
 sub _build_dbh {
   my $self = shift;
@@ -31,6 +33,28 @@ sub _build_dbh {
       AutoCommit => 1    # see below "begin_work" based transaction handling
     }
   );
+}
+
+sub _build_dsn {
+  my $self = shift;
+
+  return $self->dbh->get_info( $GetInfoType{ SQL_DATA_SOURCE_NAME } );
+}
+
+sub _build_tracking_schema {
+  my $self = shift;
+
+  if ( my ( undef, $driver ) = DBI->parse_dsn( $self->dsn ) ) {
+    return 'public' if $driver eq 'Pg';
+  }
+  return;
+}
+
+sub _build_tracking_table {
+  my $self = shift;
+
+  my $tracking_schema = $self->tracking_schema;
+  return ( defined $tracking_schema ? "$tracking_schema." : '' ) . 'dbix_migration';
 }
 
 sub BUILD {
@@ -62,7 +86,7 @@ sub migrate {
     $self->{ _dbh } = $self->dbh->clone( {} );
     $self->{ _dbh }->begin_work;
 
-    $self->_create_migration_table, $version = 0 unless defined $version;
+    $self->_create_tracking_table, $version = 0 unless defined $version;
 
     my @need;
     my $type;
@@ -97,7 +121,7 @@ sub migrate {
           $self->{ _dbh }->do( $sql );
         }
         $ver -= 1 if ( ( $ver > 0 ) && ( $type eq 'down' ) );
-        $self->_update_migration_table( $ver );
+        $self->_update_tracking_table( $ver );
       }
       return 1;
     } else {
@@ -126,8 +150,8 @@ sub version {
 
   my $dbh = $self->dbh;
   eval {
-    my $sth = $dbh->prepare( <<'EOF');
-SELECT value FROM dbix_migration WHERE name = ?;
+    my $sth = $dbh->prepare( <<"EOF");
+SELECT value FROM ${ \( $self->tracking_table ) } WHERE name = ?;
 EOF
     $sth->execute( 'version' );
     my $version = undef;
@@ -174,22 +198,22 @@ sub _latest {
   return $latest;
 }
 
-sub _create_migration_table {
+sub _create_tracking_table {
   my $self = shift;
 
-  $self->{ _dbh }->do( <<'EOF');
-CREATE TABLE dbix_migration ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
+  $self->{ _dbh }->do( <<"EOF");
+CREATE TABLE ${ \( $self->tracking_table ) } ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
 EOF
-  $self->{ _dbh }->do( <<'EOF', undef, 'version', 0 );
-INSERT INTO dbix_migration ( name, value ) VALUES ( ?, ? );
+  $self->{ _dbh }->do( <<"EOF", undef, 'version', 0 );
+INSERT INTO ${ \( $self->tracking_table ) } ( name, value ) VALUES ( ?, ? );
 EOF
 }
 
-sub _update_migration_table {
+sub _update_tracking_table {
   my ( $self, $version ) = @_;
 
-  $self->{ _dbh }->do( <<'EOF', undef, $version, 'version' );
-UPDATE dbix_migration SET value = ? WHERE name = ?;
+  $self->{ _dbh }->do( <<"EOF", undef, $version, 'version' );
+UPDATE ${ \( $self->tracking_table ) } SET value = ? WHERE name = ?;
 EOF
 }
 

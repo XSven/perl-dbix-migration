@@ -112,8 +112,8 @@ Get database username.
 =item $self->version
 
 Get migration version from database. Will be C<undef> if no migration has taken
-place yet. The version is stored in the table C<dbix_migration>. The name of
-this table may change in the future so don't rely on it.
+place yet. The version is stored in the tracking table C<dbix_migration>. The
+name of this table may change in the future so don't rely on it.
 
 =back
 
