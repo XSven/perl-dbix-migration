@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
+?.?? Tue Feb 18 07:29:32 CET 2025
+        - Make Moo constructor strict
+
 0.13 Mon Feb 17 17:37:24 CET 2025
         - Use EXECUTE PROCEDURE instead of EXECUTE FUNCTION in PostgreSQL
           related trigger test to make CPAN testers happy

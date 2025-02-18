@@ -12,7 +12,7 @@ DBIx::Migration - Seamless database schema up- and downgrades
     dsn => 'dbi:SQLite:~/Projects/myapp/db/myapp.db'
   );
 
-  # Get current version from database
+  # Get current migration version from database
   my $version = $m->version;
 
   # Set directory before applying migrations
@@ -24,22 +24,22 @@ DBIx::Migration - Seamless database schema up- and downgrades
   # Migrate database to the latest version
   $m->migrate;
 
-  # ~/Projects/myapp/db/migrations/schema_1_up.sql
+  -- ~/Projects/myapp/db/migrations/schema_1_up.sql
   CREATE TABLE foo (
     id INTEGER PRIMARY KEY,
     bar TEXT
   );
 
-  # ~/Projects/myapp/db/migrations/schema_1_down.sql
+  -- ~/Projects/myapp/db/migrations/schema_1_down.sql
   DROP TABLE foo;
 
-  # ~/Projects/myapp/db/migrations/schema_2_up.sql
+  -- ~/Projects/myapp/db/migrations/schema_2_up.sql
   CREATE TABLE bar (
     id INTEGER PRIMARY KEY,
     baz TEXT
   );
 
-  # ~/Projects/myapp/db/migrations/schema_2_down.sql
+  -- ~/Projects/myapp/db/migrations/schema_2_down.sql
   DROP TABLE bar;
 
 =head1 DESCRIPTION

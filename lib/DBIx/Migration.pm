@@ -1,19 +1,17 @@
-use strict;
-use warnings;
-
 package DBIx::Migration;
 
 our $VERSION = '0.13';
 
 use Moo;
 use MooX::SetOnce;
+use MooX::StrictConstructor;
 
-use DBI                   qw();
-use File::Slurp           qw();
-use File::Spec::Functions qw();
-use Try::Tiny             qw();
+use DBI                   ();
+use File::Slurp           qw( read_file );
+use File::Spec::Functions qw( catfile );
+use Try::Tiny             qw( catch try );
 
-use namespace::clean -except => [ qw( before ) ];
+use namespace::clean -except => [ qw( before new ) ];
 
 has dbh                             => ( is => 'lazy' );
 has debug                           => ( is => 'rw' );
@@ -57,7 +55,7 @@ sub migrate {
   $wanted = $self->_latest unless defined $wanted;
 
   my $fatal_error;
-  my $return_value = Try::Tiny::try {
+  my $return_value = try {
     my $version = $self->version;
 
     # enable transaction turning AutoCommit off
@@ -86,7 +84,7 @@ sub migrate {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
         print qq/Processing "$name"\n/ if $self->debug;
-        my $text      = File::Slurp::read_file( $name );
+        my $text      = read_file( $name );
         my $delimiter = ( $text =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
         print qq/Delimiter is $delimiter\n/ if $self->debug;
         $text =~ s/\s*--.*$//mg;
@@ -108,8 +106,7 @@ sub migrate {
         if ( $self->debug && ( $wanted != $newver ) );
       return 0;
     }
-  }
-  Try::Tiny::catch {
+  } catch {
     $fatal_error = $_;
   };
 
@@ -151,7 +148,7 @@ sub _files {
       or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
     while ( my $file = readdir( $dh ) ) {
       next unless $file =~ /\D*${i}_$type\.sql\z/;
-      $file = File::Spec::Functions::catfile( $self->dir, $file );
+      $file = catfile( $self->dir, $file );
       print qq/Found "$file"\n/ if $self->debug;
       push @files, { name => $file, version => $i };
     }
