@@ -65,6 +65,14 @@ Executes this script and returns a proper C<exit()> argument value.
 
 =back
 
+=head1 EXAMPLES
+
+  dbix-migration -s dbixm 'dbi:Pg:service=myapp;options=--search_path=myschema' ~/Projects/myapp/db/migrations 2
+
+initiates a migration to the target version 2. The tracking schema is "dbixm".
+The managed schema is "myschema". The connection details are configured in a
+service file and extracted from there using the service name "myapp".
+
 =head1 SEE ALSO
 
 L<DBIx::Migration>
