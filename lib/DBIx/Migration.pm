@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moo;
 use MooX::SetOnce;
