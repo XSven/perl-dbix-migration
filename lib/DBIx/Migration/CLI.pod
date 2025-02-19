@@ -61,7 +61,7 @@ the I<version> is missing the latest migration version will be used.
 
 =item run()
 
-Executes this script.
+Executes this script and returns a proper C<exit()> argument value.
 
 =back
 
