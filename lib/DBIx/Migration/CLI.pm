@@ -58,7 +58,7 @@ sub run {
         exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
       );
       my $version = $m->version;
-      print STDOUT ( defined $version ? $version : '' );
+      print STDOUT ( defined $version ? $version : '' ), "\n";
       return EXIT_SUCCESS;
     }
   } catch {
