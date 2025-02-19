@@ -4,7 +4,6 @@ use warnings;
 use Module::Build qw();
 
 my $build = Module::Build->new(
-  create_makefile_pl => 'passthrough',
   license            => 'perl',
   module_name        => 'DBIx::Migration',
   configure_requires => {
