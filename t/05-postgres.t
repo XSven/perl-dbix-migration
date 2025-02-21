@@ -28,6 +28,9 @@ my $m = DBIx::Migration->new( dsn => $pgsql->dsn );
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
 
+dies_ok { $m->migrate( 0 ) } '"dir" not set';
+$m->dir( cwd->child( qw( t sql basic ) ) );
+
 ok $m->migrate( 0 ), 'initially (if the "dbix_migration" table does not exist yet) a database is at version 0';
 
 subtest 'privious migrate() has triggered the "dbix_migration" table creation' => sub {
@@ -36,9 +39,6 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
   is $m->version, 0, 'check version';
   tables_are [ 'public.dbix_migration' ], 'check tables';
 };
-
-dies_ok { $m->migrate( 1 ) } '"dir" not set';
-$m->dir( cwd->child( qw( t sql basic ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

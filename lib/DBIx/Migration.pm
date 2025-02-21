@@ -74,6 +74,7 @@ sub BUILD {
 
 sub migrate {
   my ( $self, $wanted ) = @_;
+  Dir->assert_valid( $self->dir );
 
   $wanted = $self->_latest unless defined $wanted;
 
