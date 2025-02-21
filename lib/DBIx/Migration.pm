@@ -8,16 +8,15 @@ use MooX::StrictConstructor;
 
 use DBI                     ();
 use DBI::Const::GetInfoType qw( %GetInfoType );
-use File::Slurp             qw( read_file );
-use File::Spec::Functions   qw( catfile );
 use Log::Any                qw( $Logger );
 use Try::Tiny               qw( catch try );
+use Types::Path::Tiny       qw( Dir );
 
 use namespace::clean -except => [ qw( before new ) ];
 
 has [ qw( dbh dsn tracking_schema ) ] => ( is => 'lazy' );
 has tracking_table                    => ( is => 'lazy', init_arg => undef );
-has dir                               => ( is => 'rw',   once     => 1 );
+has dir                               => ( is => 'rw',   once     => 1, isa => Dir, coerce => 1 );
 has [ qw( password username ) ]       => ( is => 'ro' );
 
 sub _build_dbh {
@@ -108,7 +107,7 @@ sub migrate {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
         $Logger->debugf( "Processing migration '%s'", $name );
-        my $text      = read_file( $name );
+        my $text      = $name->slurp_raw;
         my $delimiter = ( $text =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
         $Logger->debugf( "Migration section delimiter is '%s'", $delimiter );
         $text =~ s/\s*--.*$//mg;
@@ -172,15 +171,13 @@ sub _files {
   my @files;
   for my $i ( @$need ) {
     no warnings 'uninitialized';
-    opendir( my $dh, $self->dir )
-      or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
-    while ( my $file = readdir( $dh ) ) {
-      next unless $file =~ /\D*${i}_$type\.sql\z/;
-      $file = catfile( $self->dir, $file );
-      $Logger->debugf( "Found migration '%s'", $file );
-      push @files, { name => $file, version => $i };
-    }
-    closedir( $dh );
+    $self->dir->visit(
+      sub {
+        return unless m/\D*${i}_$type\.sql\z/;
+        $Logger->debugf( "Found migration '%s'", $_ );
+        push @files, { name => $_, version => $i };
+      }
+    );
   }
 
   return ( @files and @$need == @files ) ? \@files : undef;
@@ -189,15 +186,14 @@ sub _files {
 sub _latest {
   my $self = shift;
 
-  opendir( my $dh, $self->dir )
-    or die sprintf( qq/Cannot open directory '%s': %s/, $self->dir, $! );
   my $latest = 0;
-  while ( my $file = readdir( $dh ) ) {
-    next unless $file =~ /_up\.sql\z/;
-    $file =~ /\D*(\d+)_up.sql\z/;
-    $latest = $1 if $1 > $latest;
-  }
-  closedir( $dh );
+  $self->dir->visit(
+    sub {
+      return unless m/_up\.sql\z/;
+      m/\D*(\d+)_up\.sql\z/;
+      $latest = $1 if $1 > $latest;
+    }
+  );
 
   return $latest;
 }

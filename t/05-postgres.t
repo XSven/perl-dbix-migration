@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-use File::Spec::Functions qw( catdir curdir );
+use Path::Tiny qw( cwd );
 
-use lib catdir( curdir, qw( t lib ) );
+use lib cwd->child( qw( t lib ) )->stringify;
 
 use Test::More import => [ qw( is note ok plan subtest ) ];
 use Test::Fatal qw( dies_ok );
@@ -23,7 +23,7 @@ plan tests => 14;
 
 require DBIx::Migration;
 
-my $m = DBIx::Migration->new(dsn => $pgsql->dsn );
+my $m = DBIx::Migration->new( dsn => $pgsql->dsn );
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
@@ -38,7 +38,7 @@ subtest 'privious migrate() has triggered the "dbix_migration" table creation' =
 };
 
 dies_ok { $m->migrate( 1 ) } '"dir" not set';
-$m->dir( catdir( curdir, qw( t sql basic ) ) );
+$m->dir( cwd->child( qw( t sql basic ) ) );
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
