@@ -12,8 +12,17 @@ plan $@ eq '' ? ( tests => 17 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
-like exception { DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=./t/missing/test.db' )->version },
-  qr/unable to open database file/, 'missing database file';
+subtest 'wrong dsn' => sub {
+  plan tests => 2;
+
+  like exception { DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=./t/missing/test.db' )->version },
+    qr/unable to open database file/, 'calling version() throws exception';
+
+  like exception {
+    DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=./t/missing/test.db', dir => catdir( curdir, qw( t sql basic ) ) )
+      ->migrate
+  }, qr/unable to open database file/, 'calling migrate() throws exception';
+};
 
 my $tempdir = tempdir( CLEANUP => 1 );
 my $m       = DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . catfile( $tempdir, 'test.db' ) );

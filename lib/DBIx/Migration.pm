@@ -135,12 +135,15 @@ sub migrate {
 
   if ( $fatal_error ) {
     # rollback transaction turning AutoCommit on again
-    $self->{ _dbh }->rollback;
+    $self->{ _dbh }->rollback if exists $self->{ _dbh };
+    delete $self->{ _dbh };
     # rethrow exception
     die $fatal_error;
   }
   # commit transaction turning AutoCommit on again
   $self->{ _dbh }->commit;
+  delete $self->{ _dbh };
+
   return $return_value;
 }
 
