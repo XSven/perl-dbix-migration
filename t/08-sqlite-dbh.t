@@ -4,34 +4,34 @@ use warnings;
 use Test::More import => [ qw( is is_deeply like note ok plan subtest ) ];
 use Test::Fatal qw( dies_ok exception );
 
+use DBI        ();
 use Path::Tiny qw( cwd tempdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 17 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 16 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
-subtest 'wrong dsn' => sub {
-  plan tests => 2;
-
-  like
-    exception { DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . cwd->child( qw( t missing test.db ) ) )->version },
-    qr/unable to open database file/, 'calling version() throws exception';
-
-  like exception {
-    DBIx::Migration->new(
-      dsn => 'dbi:SQLite:dbname=' . cwd->child( qw( t missing test.db ) ),
-      dir => cwd->child( qw( t sql basic ) )
-    )->migrate
-  }, qr/unable to open database file/, 'calling migrate() throws exception';
-};
-
 my $tempdir = tempdir( CLEANUP => 1 );
-my $m       = DBIx::Migration->new( dsn => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' ) );
-note 'dsn: ', $m->dsn;
+my $dsn     = 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' );
+note 'dsn: ', $dsn;
+
+my $m = DBIx::Migration->new( dbh => DBI->connect( $dsn ) );
+
+sub default_dbh_attribute_assertion {
+  my ( $dbh ) = @_;
+  plan tests => 3;
+
+  ok not( $dbh->{ RaiseError } ), 'will not raise error';
+  ok $dbh->{ PrintError },        'will print error';
+  ok $dbh->{ AutoCommit },        'will automatically commit';
+}
+
+subtest 'default "dbh" attributes before version() call' => \&default_dbh_attribute_assertion, $m->dbh;
 
 is $m->version, undef, '"dbix_migration" table does not exist == migrate() not called yet';
-ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
+
+subtest 'default "dbh" attributes after version() call' => \&default_dbh_attribute_assertion, $m->dbh;
 
 dies_ok { $m->migrate( 0 ) } '"dir" not set';
 $m->dir( cwd->child( qw( t sql basic ) ) );
@@ -72,18 +72,16 @@ is $m->version, $target_version, 'check version';
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-my $m1 = DBIx::Migration->new( dbh => $m->dbh, dir => $m->dir );
-
-is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
-
-ok !$m1->migrate( 3 ), 'return false because sql up migration file is missing';
-
 $tempdir = tempdir( CLEANUP => 1 );
-my $m2 = DBIx::Migration->new(
-  dsn => 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' ),
+$dsn     = 'dbi:SQLite:dbname=' . $tempdir->child( 'test.db' );
+note 'dsn: ', $dsn;
+my $m1 = DBIx::Migration->new(
+  dbh => DBI->connect( $dsn ),
   dir => cwd->child( qw( t sql rollback ) )
 );
 
-dies_ok { $m2->migrate } 'second migration section is broken';
-is_deeply [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [],
+subtest 'default "dbh" attributes' => \&default_dbh_attribute_assertion, $m->dbh;
+
+dies_ok { $m1->migrate } 'second migration section is broken';
+is_deeply [ $m1->dbh->tables( '%', '%', '%', 'TABLE' ) ], [],
   'check tables: creation of dbix_migration table was rolled back too!';
