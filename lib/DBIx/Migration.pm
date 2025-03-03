@@ -18,6 +18,7 @@ has [ qw( dbh dsn tracking_schema ) ] => ( is => 'lazy' );
 has tracking_table                    => ( is => 'lazy', init_arg => undef );
 has dir                               => ( is => 'rw',   once     => 1, isa => Dir, coerce => 1 );
 has [ qw( password username ) ]       => ( is => 'ro' );
+has managed_schema                    => ( is => 'ro', predicate => '_has_managed_schema' );
 
 sub _build_dbh {
   my $self = shift;
@@ -34,6 +35,23 @@ sub _build_dbh {
   );
 }
 
+sub _apply_managed_schema {
+  my $self = shift;
+
+  if ( my $driver = $self->_get_driver ) {
+    if ( $driver eq 'Pg' ) {
+      my $managed_schema = $self->managed_schema;
+      $Logger->debugf( "Set '%s' PostgreSQL specific attribute to '%s'", 'search_path', $managed_schema );
+      $self->{ _dbh }->do( <<"EOF" );
+SET search_path TO $managed_schema;
+EOF
+    } else {
+      die 'managed schmema support not implemented for $driver driver';
+    }
+  }
+  return;
+}
+
 sub _build_dsn {
   my $self = shift;
 
@@ -43,7 +61,7 @@ sub _build_dsn {
 sub _build_tracking_schema {
   my $self = shift;
 
-  if ( my ( undef, $driver ) = DBI->parse_dsn( $self->dsn ) ) {
+  if ( my $driver = $self->_get_driver ) {
     return 'public' if $driver eq 'Pg';
   }
   return;
@@ -54,6 +72,14 @@ sub _build_tracking_table {
 
   my $tracking_schema = $self->tracking_schema;
   return ( defined $tracking_schema ? "$tracking_schema." : '' ) . 'dbix_migration';
+}
+
+sub _get_driver {
+  my $self = shift;
+
+  my ( undef, $driver ) = DBI->parse_dsn( $self->dsn );
+
+  return $driver;
 }
 
 sub BUILD {
@@ -82,11 +108,19 @@ sub migrate {
   my $return_value = try {
     my $version = $self->version;
 
-    $self->{ _dbh } = $self->dbh->clone( { RaiseError => 1, PrintError => 0, AutoCommit => 1 } );
+    $self->{ _dbh } = $self->dbh->clone(
+      {
+        RaiseError => 1,
+        PrintError => 0,
+        AutoCommit => 1,
+      }
+    );
     # enable transaction turning AutoCommit off
     $self->{ _dbh }->begin_work;
 
     $self->_create_tracking_table, $version = 0 unless defined $version;
+
+    $self->_apply_managed_schema if $self->_has_managed_schema;
 
     my @need;
     my $type;
