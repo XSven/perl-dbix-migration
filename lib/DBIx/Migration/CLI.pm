@@ -24,7 +24,7 @@ sub run {
       chomp $warning;
       $exitval = _usage( -exitval => 2, -message => $warning );
     };
-    getopts( '-Vhp:s:u:v', $opts = {} );
+    getopts( '-Vhp:t:u:v', $opts = {} );
   }
   return $exitval if defined $exitval;
 
@@ -46,7 +46,7 @@ sub run {
         dir      => $dir,
         password => $opts->{ p },
         username => $opts->{ u },
-        exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
+        exists $opts->{ t } ? ( tracking_schema => $opts->{ t } ) : ()
       );
 
       return ( $m->migrate( shift @ARGV ) ? EXIT_SUCCESS : EXIT_FAILURE );
@@ -55,7 +55,7 @@ sub run {
         dsn      => $dsn,
         password => $opts->{ p },
         username => $opts->{ u },
-        exists $opts->{ s } ? ( tracking_schema => $opts->{ s } ) : ()
+        exists $opts->{ t } ? ( tracking_schema => $opts->{ t } ) : ()
       );
       my $version = $m->version;
       print STDOUT ( defined $version ? $version : '' ), "\n";
