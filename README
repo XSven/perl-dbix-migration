@@ -126,6 +126,17 @@ LOGGING
 
       LOG_ANY_DEFAULT_ADAPTER=Stderr
 
+COMPARISONS
+    There are more database migration libraries on the CPAN. This chapter
+    tries to compare some of them. The content is work in progress.
+
+      |                         | DBIx::Migration                 | App::Sqitch            |
+      +-------------------------+---------------------------------+------------------------+
+      | change                  | migration                       | change                 |
+      | SQL script types        | up, down                        | deploy, revert, verify |
+      | tracking                | tracking table                  | registry tables        |
+      | dependency relationship | linear (numbered consecutively) | tree like (requires)   |
+
 SEE ALSO
     *   Liquibase end delimiter
         <https://docs.liquibase.com/change-types/enddelimiter-sql.html>
@@ -134,6 +145,8 @@ SEE ALSO
         <https://docs.liquibase.com/parameters/liquibase-schema-name.html>
 
     *   App::Sqitch
+
+    *   Mojo::Pg::Migrations
 
 AUTHOR
     Sebastian Riedel, <kraihx@gmail.com>

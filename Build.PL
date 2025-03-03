@@ -26,7 +26,8 @@ my $build = Module::Build->new(
   recommends => {
     'Test::Needs'         => 0,
     'Test::Pod'           => 1.26,
-    'Test::Pod::Coverage' => 1.04
+    'Test::Pod::Coverage' => 1.04,
+    'Text::Table::Tiny'   => 1.02
   },
   requires => {
     'perl'                    => '5.8.9',

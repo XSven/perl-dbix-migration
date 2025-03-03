@@ -148,6 +148,18 @@ C<LOG_ANY_DEFAULT_ADAPTER> environment variable:
 
   LOG_ANY_DEFAULT_ADAPTER=Stderr
 
+=head1 COMPARISONS
+
+There are more database migration libraries on the CPAN. This chapter tries to
+compare some of them. The content is work in progress.
+
+  |                         | DBIx::Migration                 | App::Sqitch            |
+  +-------------------------+---------------------------------+------------------------+
+  | change                  | migration                       | change                 |
+  | SQL script types        | up, down                        | deploy, revert, verify |
+  | tracking                | tracking table                  | registry tables        |
+  | dependency relationship | linear (numbered consecutively) | tree like (requires)   |
+
 =head1 SEE ALSO
 
 =over
@@ -157,6 +169,8 @@ C<LOG_ANY_DEFAULT_ADAPTER> environment variable:
 =item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
 
 =item * L<App::Sqitch>
+
+=item * L<Mojo::Pg::Migrations>
 
 =back
 

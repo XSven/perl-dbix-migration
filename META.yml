@@ -35,6 +35,7 @@ recommends:
   Test::Needs: '0'
   Test::Pod: '1.26'
   Test::Pod::Coverage: '1.04'
+  Text::Table::Tiny: '1.02'
 requires:
   DBI: '1.33'
   File::Spec: '0'
