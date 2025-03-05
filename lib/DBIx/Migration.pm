@@ -14,11 +14,11 @@ use Types::Path::Tiny       qw( Dir );
 
 use namespace::clean -except => [ qw( before new ) ];
 
-has [ qw( dbh dsn tracking_schema ) ] => ( is => 'lazy' );
-has tracking_table                    => ( is => 'lazy', init_arg => undef );
-has dir                               => ( is => 'rw',   once     => 1, isa => Dir, coerce => 1 );
-has [ qw( password username ) ]       => ( is => 'ro' );
-has managed_schema                    => ( is => 'ro', predicate => '_has_managed_schema' );
+has [ qw( dbh dsn ) ]           => ( is => 'lazy' );
+has dir                         => ( is => 'rw', once => 1, isa => Dir, coerce => 1 );
+has [ qw( password username ) ] => ( is => 'ro' );
+has managed_schema              => ( is => 'ro', predicate => '_has_managed_schema' );
+has tracking_schema             => ( is => 'ro', predicate => '_has_tracking_schema' );
 
 sub _build_dbh {
   my $self = shift;
@@ -58,20 +58,10 @@ sub _build_dsn {
   return $self->dbh->get_info( $GetInfoType{ SQL_DATA_SOURCE_NAME } );
 }
 
-sub _build_tracking_schema {
+sub tracking_table {
   my $self = shift;
 
-  if ( my $driver = $self->_get_driver ) {
-    return 'public' if $driver eq 'Pg';
-  }
-  return;
-}
-
-sub _build_tracking_table {
-  my $self = shift;
-
-  my $tracking_schema = $self->tracking_schema;
-  return ( defined $tracking_schema ? "$tracking_schema." : '' ) . 'dbix_migration';
+  return ( $self->_has_tracking_schema ? $self->tracking_schema . '.' : '' ) . 'dbix_migration';
 }
 
 sub _get_driver {

@@ -79,12 +79,17 @@ previous example it is the C</> (slash) character.
 =head2 Managed schema vs tracking schema
 
 The schema support of this implementation should be considered B<experimental>.
+
 For a PostgreSQL database you may set the managed schema (the schema of your
-single-schema application) using the C<search_path> connect option:
+single-schema application) using
 
   my $m = DBIx::Migration->new(
-    dsn => 'dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres;options=--search_path=myschema'
+    dsn            => 'dbi:Pg:dbname=test;host=localhost;port=5432;user=postgres',
+    managed_schema => 'myschema'
   );
+
+Implicitly the managed schema is assigned to the C<search_path> connect
+option.
 
 The migration object stores the current migration version in a tracking table.
 Its default unqualified name is C<dbix_migration>. The table belongs by default
@@ -109,6 +114,10 @@ Get data source name.
 =item $self->dbh
 
 Get database handle.
+
+=item $self->managed_schema
+
+Get schema that your single-schema application refers to.
 
 =item $self->migrate( $version )
 

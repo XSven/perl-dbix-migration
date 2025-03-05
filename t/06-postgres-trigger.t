@@ -30,8 +30,12 @@ plan tests => 9;
 
 require DBIx::Migration;
 
-my $m =
-  DBIx::Migration->new( dsn => $dsn, managed_schema => $managed_schema, dir => cwd->child( qw( t sql trigger ) ) );
+my $m = DBIx::Migration->new(
+  managed_schema  => $managed_schema,
+  tracking_schema => $tracking_schema,
+  dsn             => $dsn,
+  dir             => cwd->child( qw( t sql trigger ) )
+);
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
