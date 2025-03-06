@@ -21,21 +21,20 @@ my $pgsql = eval { Test::PostgreSQL->new } or do {
   no warnings 'once';
   plan skip_all => $Test::PostgreSQL::errstr;
 };
-note 'tracking schema: ', my $tracking_schema = 'public';
-note 'managed schema: ',  my $managed_schema  = 'myschema';
-note 'dsn: ',             my $dsn             = $pgsql->dsn;
+note 'managed schema: ', my $managed_schema = 'myschema';
+note 'dsn: ',            my $dsn            = $pgsql->dsn;
 local $Test::PgTAP::Dbh = DBI->connect( $dsn . ";options=--search_path=$managed_schema" );
 
 plan tests => 9;
 
-require DBIx::Migration;
+require DBIx::Migration::Pg;
 
-my $m = DBIx::Migration->new(
-  managed_schema  => $managed_schema,
-  tracking_schema => $tracking_schema,
-  dsn             => $dsn,
-  dir             => cwd->child( qw( t sql trigger ) )
+my $m = DBIx::Migration::Pg->new(
+  managed_schema => $managed_schema,
+  dsn            => $dsn,
+  dir            => cwd->child( qw( t sql trigger ) )
 );
+my $tracking_schema = $m->tracking_schema;
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;

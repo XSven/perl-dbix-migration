@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
         - Add COMPARISONS chapter
         - Rename tracking_schema command-line option from -s to -t
         - Add managed_schema attribute
+        - Add PostgreSQL driver specific subclass
 
 0.18 Fri Feb 28 14:48:50 CET 2025
         - Consistently work with dbh attributes

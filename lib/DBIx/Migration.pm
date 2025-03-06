@@ -17,8 +17,7 @@ use namespace::clean -except => [ qw( before new ) ];
 has [ qw( dbh dsn ) ]           => ( is => 'lazy' );
 has dir                         => ( is => 'rw', once => 1, isa => Dir, coerce => 1 );
 has [ qw( password username ) ] => ( is => 'ro' );
-has managed_schema              => ( is => 'ro', predicate => '_has_managed_schema' );
-has tracking_schema             => ( is => 'ro', predicate => '_has_tracking_schema' );
+has tracking_table              => ( is => 'ro', default => 'dbix_migration' );
 
 sub _build_dbh {
   my $self = shift;
@@ -35,41 +34,10 @@ sub _build_dbh {
   );
 }
 
-sub _apply_managed_schema {
-  my $self = shift;
-
-  if ( my $driver = $self->_get_driver ) {
-    if ( $driver eq 'Pg' ) {
-      my $managed_schema = $self->managed_schema;
-      $Logger->debugf( "Set '%s' PostgreSQL specific attribute to '%s'", 'search_path', $managed_schema );
-      $self->{ _dbh }->do( <<"EOF" );
-SET search_path TO $managed_schema;
-EOF
-    } else {
-      die 'managed schmema support not implemented for $driver driver';
-    }
-  }
-  return;
-}
-
 sub _build_dsn {
   my $self = shift;
 
   return $self->dbh->get_info( $GetInfoType{ SQL_DATA_SOURCE_NAME } );
-}
-
-sub tracking_table {
-  my $self = shift;
-
-  return ( $self->_has_tracking_schema ? $self->tracking_schema . '.' : '' ) . 'dbix_migration';
-}
-
-sub _get_driver {
-  my $self = shift;
-
-  my ( undef, $driver ) = DBI->parse_dsn( $self->dsn );
-
-  return $driver;
 }
 
 sub BUILD {
@@ -86,6 +54,24 @@ sub BUILD {
   } else {
     die 'both dsn and dbh are not set';
   }
+}
+
+# end of attribute handling implementation
+
+sub apply_managed_schema { }
+
+sub quoted_tracking_table {
+  my $self = shift;
+
+  return $self->dbh->quote_identifier( $self->tracking_table );
+}
+
+# end methods to override
+
+sub driver {
+  my $self = shift;
+
+  return ( DBI->parse_dsn( $self->dsn ) )[ 1 ];
 }
 
 sub migrate {
@@ -110,7 +96,7 @@ sub migrate {
 
     $self->_create_tracking_table, $version = 0 unless defined $version;
 
-    $self->_apply_managed_schema if $self->_has_managed_schema;
+    $self->apply_managed_schema;
 
     my @need;
     my $type;
@@ -177,7 +163,7 @@ sub version {
   my $dbh = $self->dbh;
   local @{ $dbh }{ qw( RaiseError PrintError ) } = ( 1, 0 );
   try {
-    my $tracking_table = $self->tracking_table;
+    my $tracking_table = $self->quoted_tracking_table;
     $Logger->debugf( "Reading tracking table '%s'", $tracking_table );
     my $sth = $dbh->prepare( <<"EOF" );
 SELECT value FROM $tracking_table WHERE name = ?;
@@ -227,7 +213,7 @@ sub _latest {
 sub _create_tracking_table {
   my $self = shift;
 
-  my $tracking_table = $self->tracking_table;
+  my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Creating tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF" );
 CREATE TABLE $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
@@ -240,7 +226,7 @@ EOF
 sub _update_tracking_table {
   my ( $self, $version ) = @_;
 
-  my $tracking_table = $self->tracking_table;
+  my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Updating tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF", undef, $version, 'version' );
 UPDATE $tracking_table SET value = ? WHERE name = ?;
