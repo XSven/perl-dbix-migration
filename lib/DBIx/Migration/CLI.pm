@@ -50,7 +50,7 @@ sub run {
       dsn      => $dsn,
       password => $opts->{ p },
       username => $opts->{ u },
-      ( exists $opts->{ s } and $class->can( 'managed_schema' ) )  ? ( managed_schema  => $opts->{ t } ) : (),
+      ( exists $opts->{ s } and $class->can( 'managed_schema' ) )  ? ( managed_schema  => $opts->{ s } ) : (),
       ( exists $opts->{ t } and $class->can( 'tracking_schema' ) ) ? ( tracking_schema => $opts->{ t } ) : ()
     );
     if ( @ARGV ) {
