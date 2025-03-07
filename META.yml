@@ -40,6 +40,7 @@ requires:
   DBI: '1.33'
   File::Spec: '0'
   Log::Any: '1.044'
+  Module::Load::Conditional: '0.6'
   Moo: '0'
   MooX::SetOnce: '0'
   MooX::StrictConstructor: '0'
