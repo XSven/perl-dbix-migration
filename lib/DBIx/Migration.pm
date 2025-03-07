@@ -75,10 +75,12 @@ sub quoted_tracking_table {
   return $self->dbh->quote_identifier( $self->tracking_table );
 }
 
+# can be used as an object method ($dsn not specified) and as a class method
+# ($dsn specified)
 sub driver {
-  my $self = shift;
+  my ( $self, $dsn ) = @_;
 
-  return ( DBI->parse_dsn( $self->dsn ) )[ 1 ];
+  return ( DBI->parse_dsn( defined $dsn ? $dsn : $self->dsn ) )[ 1 ];
 }
 
 sub migrate {

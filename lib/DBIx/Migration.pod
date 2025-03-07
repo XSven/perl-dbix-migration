@@ -131,7 +131,7 @@ Get database username.
 Drivers that support schemas like PostgreSQL should override this method to set
 a managed schema before processing migrations.
 
-=item $self->driver
+=item $self->driver, $class->driver( $dsn )
 
 Extracts and returns the driver name from the data source name.
 

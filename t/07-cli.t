@@ -64,7 +64,7 @@ subtest 'version is undefined' => sub {
 
   my $got_exitval;
   stdout_is { $got_exitval = $coderef->( $dsn ) } "\n", 'check stdout';
-  is $got_exitval, 0, 'check exit value';
+  is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
 my $dir = cwd->child( qw( t sql basic ) );
@@ -73,7 +73,7 @@ subtest 'migrate to version 0' => sub {
 
   my $got_exitval;
   stdout_is { $got_exitval = $coderef->( $dsn, $dir, 0 ) } '', 'check stdout';
-  is $got_exitval, 0, 'check exit value';
+  is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
 subtest 'version is 0' => sub {
@@ -81,7 +81,7 @@ subtest 'version is 0' => sub {
 
   my $got_exitval;
   stdout_is { $got_exitval = $coderef->( $dsn ) } "0\n", 'check stdout';
-  is $got_exitval, 0, 'check exit value';
+  is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
 subtest 'migrate to latest version' => sub {
@@ -89,7 +89,7 @@ subtest 'migrate to latest version' => sub {
 
   my $got_exitval;
   stdout_is { $got_exitval = $coderef->( $dsn, $dir ) } '', 'check stdout';
-  is $got_exitval, 0, 'check exit value';
+  is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
 subtest 'version is latest' => sub {
@@ -97,7 +97,7 @@ subtest 'version is latest' => sub {
 
   my $got_exitval;
   stdout_is { $got_exitval = $coderef->( $dsn ) } "2\n", 'check stdout';
-  is $got_exitval, 0, 'check exit value';
+  is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
 subtest 'migrate to missing version' => sub {
