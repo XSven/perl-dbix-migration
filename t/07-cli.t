@@ -105,5 +105,5 @@ subtest 'migrate to missing version' => sub {
 
   my $got_exitval;
   stdout_is { $got_exitval = $coderef->( $dsn, $dir, 3 ) } '', 'check stdout';
-  is $got_exitval, 1, 'check exit value';
+  is $got_exitval, EXIT_FAILURE, 'check exit value';
 };

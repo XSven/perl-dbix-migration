@@ -26,7 +26,7 @@ sub run {
       chomp $warning;
       $exitval = _usage( -exitval => 2, -message => $warning );
     };
-    getopts( '-Vhp:t:u:v', $opts = {} );
+    getopts( '-Vhp:s:t:u:v', $opts = {} );
   }
   return $exitval if defined $exitval;
 
@@ -46,26 +46,21 @@ sub run {
     my $class  = "DBIx::Migration::$driver";
     $class = 'DBIx::Migration' unless can_load( modules => { $class => undef } );
     $Logger->infof( "Will use '%s' class to process migrations", $class );
+    my $m = $class->new(
+      dsn      => $dsn,
+      password => $opts->{ p },
+      username => $opts->{ u },
+      ( exists $opts->{ s } and $class->can( 'managed_schema' ) )  ? ( managed_schema  => $opts->{ t } ) : (),
+      ( exists $opts->{ t } and $class->can( 'tracking_schema' ) ) ? ( tracking_schema => $opts->{ t } ) : ()
+    );
     if ( @ARGV ) {
-      my $dir = shift @ARGV;
-      my $m   = $class->new(
-        dsn      => $dsn,
-        dir      => $dir,
-        password => $opts->{ p },
-        username => $opts->{ u },
-        ( exists $opts->{ t } and $class->can( 'tracking_schema' ) ) ? ( tracking_schema => $opts->{ t } ) : ()
-      );
+      $m->dir( shift @ARGV );
 
       return ( $m->migrate( shift @ARGV ) ? EXIT_SUCCESS : EXIT_FAILURE );
     } else {
-      my $m = $class->new(
-        dsn      => $dsn,
-        password => $opts->{ p },
-        username => $opts->{ u },
-        ( exists $opts->{ t } and $class->can( 'tracking_schema' ) ) ? ( tracking_schema => $opts->{ t } ) : ()
-      );
       my $version = $m->version;
       print STDOUT ( defined $version ? $version : '' ), "\n";
+
       return EXIT_SUCCESS;
     }
   } catch {
