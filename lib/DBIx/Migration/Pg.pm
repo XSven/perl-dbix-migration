@@ -17,17 +17,11 @@ has tracking_schema => ( is => 'ro', default => 'public' );
 sub apply_managed_schema {
   my $self = shift;
 
-  if ( my $driver = $self->driver ) {
-    if ( $driver eq 'Pg' ) {
-      my $managed_schema = $self->managed_schema;
-      $Logger->debugf( "Set '%s' PostgreSQL specific attribute to '%s'", 'search_path', $managed_schema );
-      $self->{ _dbh }->do( <<"EOF" );
+  my $managed_schema = $self->managed_schema;
+  $Logger->debugf( "Set '%s' PostgreSQL specific attribute to '%s'", 'search_path', $managed_schema );
+  $self->{ _dbh }->do( <<"EOF" );
 SET search_path TO $managed_schema;
 EOF
-    } else {
-      die 'managed schmema support not implemented for $driver driver';
-    }
-  }
 
   return;
 }

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT like use_ok ) ], tests => 7;
+use Test::More import => [ qw( BAIL_OUT like use_ok ) ], tests => 8;
 use Test::API import => [ qw( class_api_ok ) ];
 use Test::Fatal qw( exception );
 
@@ -17,7 +17,8 @@ BEGIN {
 # "before" should not be part of the API:
 # https://github.com/haarg/MooX-SetOnce/issues/2
 class_api_ok( $class,
-  qw( before new dbh dir dsn username password tracking_table apply_managed_schema quoted_tracking_table driver migrate version ));
+  qw( before new dbh dir dsn username password tracking_table apply_managed_schema quoted_tracking_table driver migrate version )
+);
 
 class_api_ok( $subclass, qw( new managed_schema tracking_schema apply_managed_schema quoted_tracking_table ) );
 
@@ -28,3 +29,9 @@ like exception { $class->new( dsn => 'dbi:Mock:', dbh => DBI->connect( 'dbi:Mock
 
 like exception { $class->new( dbh => DBI->connect( 'dbi:Mock:', undef, undef, {} ), username => 'foo' ) },
   qr/\Adbh and username cannot be used at the same time/, '"dbh" and "username" are mutually exclusive';
+
+my $dbh = DBI->connect( 'dbi:Mock:', undef, undef, {} );
+use DBI::Const::GetInfoType qw( %GetInfoType );
+$dbh->{ mock_get_info } = { $GetInfoType{ SQL_DATA_SOURCE_NAME } => 'dbi:SQLite:' };
+like exception { $subclass->new( dbh => $dbh ) },
+  qr/\Asubclass DBIx::Migration::Pg cannot handle SQLite driver/, 'subclass-driver inconsistency';

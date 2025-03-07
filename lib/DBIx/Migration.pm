@@ -43,6 +43,7 @@ sub _build_dsn {
 sub BUILD {
   my ( $self, $args ) = @_;
 
+  # new() is overloaded: check consistency of attributes
   if ( exists $args->{ dsn } ) {
     die 'dsn and dbh cannot be used at the same time'
       if exists $args->{ dbh };
@@ -54,19 +55,25 @@ sub BUILD {
   } else {
     die 'both dsn and dbh are not set';
   }
+
+  # driver should match subclass
+  my $class = ref $self;
+  if ( ( my @package = split( /::/, $class ) ) > 2 ) {
+    my $driver = $self->driver;
+    die "subclass $class cannot handle $driver driver"
+      unless $driver eq $package[ -1 ];
+  }
 }
 
-# end of attribute handling implementation
-
+# overrideable
 sub apply_managed_schema { }
 
+# overrideable
 sub quoted_tracking_table {
   my $self = shift;
 
   return $self->dbh->quote_identifier( $self->tracking_table );
 }
-
-# end methods to override
 
 sub driver {
   my $self = shift;
