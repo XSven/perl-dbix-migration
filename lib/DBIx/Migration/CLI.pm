@@ -12,6 +12,7 @@ use Getopt::Std               qw( getopts );
 use Log::Any                  ();
 use Log::Any::Adapter         ();
 use Module::Load::Conditional qw( can_load );
+use PerlX::Maybe              qw( maybe );
 use POSIX                     qw( EXIT_FAILURE EXIT_SUCCESS );
 use Try::Tiny                 qw( catch try );
 
@@ -50,8 +51,9 @@ sub run {
       dsn      => $dsn,
       password => $opts->{ p },
       username => $opts->{ u },
-      ( exists $opts->{ s } and $class->can( 'managed_schema' ) )  ? ( managed_schema  => $opts->{ s } ) : (),
-      ( exists $opts->{ t } and $class->can( 'tracking_schema' ) ) ? ( tracking_schema => $opts->{ t } ) : ()
+      maybe
+        managed_schema => $opts->{ s },
+      maybe tracking_schema => $opts->{ t }
     );
     if ( @ARGV ) {
       $m->dir( shift @ARGV );
