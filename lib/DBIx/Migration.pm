@@ -91,7 +91,10 @@ sub migrate {
 
   my $fatal_error;
   my $return_value = try {
-    my $version = $self->version;
+
+    # on purpose outside of the transaction
+    # doesn't use _dbh (the cloned dbh)
+    $self->_create_tracking_table;
 
     $self->{ _dbh } = $self->dbh->clone(
       {
@@ -104,9 +107,10 @@ sub migrate {
     $Logger->debug( 'Enable transaction turning AutoCommit off' );
     $self->{ _dbh }->begin_work;
 
-    $self->_create_tracking_table, $version = 0 unless defined $version;
-
     $self->adjust_migrate;
+
+    my $version = $self->version;
+    $self->_initialize_tracking_table, $version = 0 unless defined $version;
 
     my @need;
     my $type;
@@ -225,9 +229,16 @@ sub _create_tracking_table {
 
   my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Create tracking table '%s'", $tracking_table );
-  $self->{ _dbh }->do( <<"EOF" );
+  $self->dbh->do( <<"EOF" );
 CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
 EOF
+}
+
+sub _initialize_tracking_table {
+  my $self = shift;
+
+  my $tracking_table = $self->quoted_tracking_table;
+  $Logger->debugf( "Initialize tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF", undef, 'version', 0 );
 INSERT INTO $tracking_table ( name, value ) VALUES ( ?, ? );
 EOF
