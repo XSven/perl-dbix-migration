@@ -84,10 +84,10 @@ sub driver {
 }
 
 sub migrate {
-  my ( $self, $wanted ) = @_;
+  my ( $self, $target ) = @_;
   Dir->assert_valid( $self->dir );
 
-  $wanted = $self->_latest unless defined $wanted;
+  $target = $self->_latest unless defined $target;
 
   my $fatal_error;
   my $return_value = try {
@@ -100,7 +100,8 @@ sub migrate {
         AutoCommit => 1,
       }
     );
-    # enable transaction turning AutoCommit off
+
+    $Logger->debug( 'Enable transaction turning AutoCommit off' );
     $self->{ _dbh }->begin_work;
 
     $self->_create_tracking_table, $version = 0 unless defined $version;
@@ -109,24 +110,24 @@ sub migrate {
 
     my @need;
     my $type;
-    if ( $wanted == $version ) {
-      $Logger->debugf( 'Database is already at migration version %d', $wanted );
+    if ( $target == $version ) {
+      $Logger->debugf( 'Database is already at migration version %d', $target );
       return 1;
-    } elsif ( $wanted > $version ) {    # upgrade
+    } elsif ( $target > $version ) {    # upgrade
       $type = 'up';
       $version += 1;
-      @need = $version .. $wanted;
+      @need = $version .. $target;
     } else {                            # downgrade
       $type = 'down';
-      $wanted += 1;
-      @need = reverse( $wanted .. $version );
+      $target += 1;
+      @need = reverse( $target .. $version );
     }
     my $files = $self->_files( $type, \@need );
     if ( defined $files ) {
       for my $file ( @$files ) {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
-        $Logger->debugf( "Processing migration '%s'", $name );
+        $Logger->debugf( "Process migration '%s'", $name );
         my $text      = $name->slurp_raw;
         my $delimiter = ( $text =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
         $Logger->debugf( "Migration section delimiter is '%s'", $delimiter );
@@ -144,8 +145,8 @@ sub migrate {
       return 1;
     } else {
       my $newver = $self->version;
-      $Logger->debugf( "Database is at version %d, couldn't migrate to version %d", $newver, $wanted )
-        if $wanted != $newver;
+      $Logger->debugf( "Database is at version %d, couldn't migrate to version %d", $newver, $target )
+        if $target != $newver;
       return 0;
     }
   } catch {
@@ -153,13 +154,13 @@ sub migrate {
   };
 
   if ( $fatal_error ) {
-    # rollback transaction turning AutoCommit on again
-    $self->{ _dbh }->rollback if exists $self->{ _dbh };
+    $Logger->debug( 'Rollback transaction turning AutoCommit on again' ), $self->{ _dbh }->rollback
+      if exists $self->{ _dbh };
     delete $self->{ _dbh };
     # rethrow exception
     die $fatal_error;
   }
-  # commit transaction turning AutoCommit on again
+  $Logger->debug( 'Commit transaction turning AutoCommit on again' );
   $self->{ _dbh }->commit;
   delete $self->{ _dbh };
 
@@ -173,7 +174,7 @@ sub version {
   local @{ $dbh }{ qw( RaiseError PrintError ) } = ( 1, 0 );
   try {
     my $tracking_table = $self->quoted_tracking_table;
-    $Logger->debugf( "Reading tracking table '%s'", $tracking_table );
+    $Logger->debugf( "Read tracking table '%s'", $tracking_table );
     my $sth = $dbh->prepare( <<"EOF" );
 SELECT value FROM $tracking_table WHERE name = ?;
 EOF
@@ -223,7 +224,7 @@ sub _create_tracking_table {
   my $self = shift;
 
   my $tracking_table = $self->quoted_tracking_table;
-  $Logger->debugf( "Creating tracking table '%s'", $tracking_table );
+  $Logger->debugf( "Create tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF" );
 CREATE TABLE $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
 EOF
@@ -236,7 +237,7 @@ sub _update_tracking_table {
   my ( $self, $version ) = @_;
 
   my $tracking_table = $self->quoted_tracking_table;
-  $Logger->debugf( "Updating tracking table '%s'", $tracking_table );
+  $Logger->debugf( "Update tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF", undef, $version, 'version' );
 UPDATE $tracking_table SET value = ? WHERE name = ?;
 EOF
