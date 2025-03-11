@@ -66,7 +66,7 @@ sub BUILD {
 }
 
 # overrideable
-sub apply_managed_schema { }
+sub adjust_migrate { }
 
 # overrideable
 sub quoted_tracking_table {
@@ -106,7 +106,7 @@ sub migrate {
 
     $self->_create_tracking_table, $version = 0 unless defined $version;
 
-    $self->apply_managed_schema;
+    $self->adjust_migrate;
 
     my @need;
     my $type;
@@ -226,7 +226,7 @@ sub _create_tracking_table {
   my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Create tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF" );
-CREATE TABLE $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
+CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
 EOF
   $self->{ _dbh }->do( <<"EOF", undef, 'version', 0 );
 INSERT INTO $tracking_table ( name, value ) VALUES ( ?, ? );
