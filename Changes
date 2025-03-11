@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
-?.?? Tue Mar 11 08:25:59 CET 2025
+0.21 Tue Mar 11 08:25:59 CET 2025
         - Improve logging
         - Rename apply_managed_schema() method to adjust_migrate()
         - Unconditionally (IF NOT EXISTS) create tracking table outside of a
