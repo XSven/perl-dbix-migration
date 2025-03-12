@@ -71,8 +71,6 @@ chapter tries to compare some of them. The content is work in progress.
 
 =item * L<Liquibase tracking schema|https://docs.liquibase.com/parameters/liquibase-schema-name.html>
 
-=item * L<App::Sqitch>
-
 =item * L<Mojo::Pg::Migrations>
 
 =back

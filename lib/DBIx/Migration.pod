@@ -168,7 +168,9 @@ C<LOG_ANY_DEFAULT_ADAPTER> environment variable:
 
 =item * L<Liquibase end delimiter|https://docs.liquibase.com/change-types/enddelimiter-sql.html>
 
-=item * L<Atlas language-independent database migration tool|https://atlasgo.io/docs>
+=item * L<atlas|https://atlasgo.io>
+
+=item * L<SQITCH|https://sqitch.org/>
 
 =back
 
