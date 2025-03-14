@@ -8,6 +8,7 @@ DBIx::Migration - Seamless database schema up- and downgrades
 
   use DBIx::Migration ();
 
+  # Create migration object overwriting default tracking table
   my $m = DBIx::Migration->new(
     dsn            => 'dbi:SQLite:~/Projects/myapp/db/myapp.db',
     tracking_table => 'myapp_migration'
