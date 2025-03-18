@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension DBIx::Migration.
 
 ?.?? Fri Mar 14 09:11:37 CET 2025
         - Fix and improve documentation
+        - Add type constraints
    
 0.21 Tue Mar 11 08:25:59 CET 2025
         - Improve logging

@@ -11,13 +11,15 @@ use DBI::Const::GetInfoType qw( %GetInfoType );
 use Log::Any                qw( $Logger );
 use Try::Tiny               qw( catch try );
 use Types::Path::Tiny       qw( Dir );
+use Types::Standard         qw( Str );
 
 use namespace::clean -except => [ qw( before new ) ];
 
-has [ qw( dbh dsn ) ]           => ( is => 'lazy' );
+has dsn                         => ( is => 'lazy', isa => Str );
+has dbh                         => ( is => 'lazy' );
 has dir                         => ( is => 'rw', once => 1, isa => Dir, coerce => 1 );
-has [ qw( password username ) ] => ( is => 'ro' );
-has tracking_table              => ( is => 'ro', default => 'dbix_migration' );
+has [ qw( password username ) ] => ( is => 'ro', isa  => Str );
+has tracking_table              => ( is => 'ro', isa  => Str, default => 'dbix_migration' );
 
 sub _build_dbh {
   my $self = shift;
