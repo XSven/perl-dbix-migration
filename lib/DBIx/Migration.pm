@@ -11,15 +11,19 @@ use DBI::Const::GetInfoType qw( %GetInfoType );
 use Log::Any                qw( $Logger );
 use Try::Tiny               qw( catch try );
 use Types::Path::Tiny       qw( Dir );
-use Types::Standard         qw( Str );
+use Types::Standard         qw( ArrayRef Str );
 
 use namespace::clean -except => [ qw( before new ) ];
 
+# 1st alternative set of constructor attributes
 has dsn                         => ( is => 'lazy', isa => Str );
-has dbh                         => ( is => 'lazy' );
-has dir                         => ( is => 'rw', once => 1, isa => Dir, coerce => 1 );
-has [ qw( password username ) ] => ( is => 'ro', isa  => Str );
-has tracking_table              => ( is => 'ro', isa  => Str, default => 'dbix_migration' );
+has [ qw( password username ) ] => ( is => 'ro',   isa => Str );
+# 2nd alternative set of constructor attributes
+has dbh => ( is => 'lazy' );
+
+has dir            => ( is => 'rw',   isa => Dir, once => 1, coerce => 1 );
+has do_before      => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
+has tracking_table => ( is => 'ro',   isa => Str, default => 'dbix_migration' );
 
 sub _build_dbh {
   my $self = shift;
@@ -105,6 +109,9 @@ sub migrate {
         AutoCommit => 1,
       }
     );
+
+    $Logger->debugf( "Execute before transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
+      foreach @{ $self->do_before };
 
     $Logger->debug( 'Enable transaction turning AutoCommit off' );
     $self->{ _dbh }->begin_work;

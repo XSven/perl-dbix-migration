@@ -98,29 +98,34 @@ Validate object.
 
 =over
 
-=item $self->dir( $dir )
-
-Get/set-once directory that contains migrations.
-
 =item $self->dsn
 
 Get data source name.
 
-=item $self->dbh
+=item $self->username
 
-Get database handle.
+Get database username.
 
 =item $self->password
 
 Get database password.
 
+=item $self->dbh
+
+Get database handle.
+
+=item $self->dir( $dir )
+
+Get/set-once directory that contains migrations.
+
+=item $self->do_before
+
+Get list of SQL statements that are executed before the migration transaction
+begins.
+
 =item $self->tracking_table
 
 Get tracking table.
-
-=item $self->username
-
-Get database username.
 
 =back
 

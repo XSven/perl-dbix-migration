@@ -44,6 +44,12 @@ attribute.
 
 =over
 
+=item $self->do_before
+
+Get PostgreSQL database specific default list of SQL statements that are
+executed before the migration transaction begins.  The default list contains a
+single statement that assigns the managed schema to the C<search_path> option.
+
 =item $self->managed_schema
 
 Get schema that your application refers to.
@@ -60,7 +66,7 @@ Get schema that the tracking table belongs to.
 
 =item $self->adjust_migrate
 
-Lock tracking table and assign managed schema to the C<search_path> option.
+Lock tracking table.
 
 =item $self->quoted_tracking_table
 

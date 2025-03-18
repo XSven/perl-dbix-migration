@@ -12,6 +12,12 @@ use namespace::clean -except => [ qw( new ) ];
 
 extends 'DBIx::Migration';
 
+has '+do_before' => (
+  default => sub {
+    my $self = shift;
+    return [ 'SET search_path TO ' . $self->managed_schema ];
+  }
+);
 has managed_schema  => ( is => 'ro', isa => Str, default => 'public' );
 has tracking_schema => ( is => 'ro', isa => Str, default => 'public' );
 
@@ -22,12 +28,6 @@ sub adjust_migrate {
   $Logger->debugf( "Lock tracking table '%s'", $tracking_table );
   $self->{ _dbh }->do( <<"EOF" );
 LOCK TABLE $tracking_table IN EXCLUSIVE MODE;
-EOF
-
-  my $managed_schema = $self->managed_schema;
-  $Logger->debugf( "Set PostgreSQL specific '%s' attribute to '%s'", 'search_path', $managed_schema );
-  $self->{ _dbh }->do( <<"EOF" );
-SET search_path TO $managed_schema;
 EOF
 
   return;
