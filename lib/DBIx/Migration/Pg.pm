@@ -18,20 +18,14 @@ has '+do_before' => (
     return [ 'SET search_path TO ' . $self->managed_schema ];
   }
 );
+has '+do_while' => (
+  default => sub {
+    my $self = shift;
+    return [ sprintf( 'LOCK TABLE %s IN EXCLUSIVE MODE', $self->quoted_tracking_table ) ];
+  }
+);
 has managed_schema  => ( is => 'ro', isa => Str, default => 'public' );
 has tracking_schema => ( is => 'ro', isa => Str, default => 'public' );
-
-sub adjust_migrate {
-  my $self = shift;
-
-  my $tracking_table = $self->quoted_tracking_table;
-  $Logger->debugf( "Lock tracking table '%s'", $tracking_table );
-  $self->{ _dbh }->do( <<"EOF" );
-LOCK TABLE $tracking_table IN EXCLUSIVE MODE;
-EOF
-
-  return;
-}
 
 sub quoted_tracking_table {
   my $self = shift;

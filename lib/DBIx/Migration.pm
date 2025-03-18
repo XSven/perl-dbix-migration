@@ -23,6 +23,7 @@ has dbh => ( is => 'lazy' );
 
 has dir            => ( is => 'rw',   isa => Dir, once => 1, coerce => 1 );
 has do_before      => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
+has do_while       => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
 has tracking_table => ( is => 'ro',   isa => Str, default => 'dbix_migration' );
 
 sub _build_dbh {
@@ -72,9 +73,6 @@ sub BUILD {
 }
 
 # overrideable
-sub adjust_migrate { }
-
-# overrideable
 sub quoted_tracking_table {
   my $self = shift;
 
@@ -110,13 +108,14 @@ sub migrate {
       }
     );
 
-    $Logger->debugf( "Execute before transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
+    $Logger->debugf( "Execute 'before' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
       foreach @{ $self->do_before };
 
     $Logger->debug( 'Enable transaction turning AutoCommit off' );
     $self->{ _dbh }->begin_work;
 
-    $self->adjust_migrate;
+    $Logger->debugf( "Execute 'while' transaction todo: '%s'", $_ ), $self->{ _dbh }->do( $_ )
+      foreach @{ $self->do_while };
 
     my $version = $self->version;
     $self->_initialize_tracking_table, $version = 0 unless defined $version;

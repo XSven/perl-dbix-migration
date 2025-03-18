@@ -121,7 +121,12 @@ Get/set-once directory that contains migrations.
 =item $self->do_before
 
 Get list of SQL statements that are executed before the migration transaction
-begins.
+begins. The list is empty by default.
+
+=item $self->do_while
+
+Get list of SQL statements that are executed immediately after the migration
+transaction was enabled. The list is empty by default.
 
 =item $self->tracking_table
 
@@ -132,11 +137,6 @@ Get tracking table.
 =head1 METHODS
 
 =over 
-
-=item $self->adjust_migrate
-
-Driver specific subclasses like for example L<DBIx::Migration::Pg> may override
-this method.
 
 =item $self->driver, $class->driver( $dsn )
 
