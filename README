@@ -85,29 +85,33 @@ LIFECYCLE METHODS
         Validate object.
 
 ACCESSORS
-    $self->dir( $dir )
-        Get/set-once directory that contains migrations.
-
     $self->dsn
         Get data source name.
-
-    $self->dbh
-        Get database handle.
-
-    $self->password
-        Get database password.
-
-    $self->tracking_table
-        Get tracking table.
 
     $self->username
         Get database username.
 
-METHODS
-    $self->adjust_migrate
-        Driver specific subclasses like for example DBIx::Migration::Pg may
-        override this method.
+    $self->password
+        Get database password.
 
+    $self->dbh
+        Get database handle.
+
+    $self->dir( $dir )
+        Get/set-once directory that contains migrations.
+
+    $self->do_before
+        Get list of SQL statements that are executed before the migration
+        transaction begins. The list is empty by default.
+
+    $self->do_while
+        Get list of SQL statements that are executed immediately after the
+        migration transaction was enabled. The list is empty by default.
+
+    $self->tracking_table
+        Get tracking table.
+
+METHODS
     $self->driver, $class->driver( $dsn )
         Extracts and returns the driver name from the data source name.
 
