@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( is is_deeply like note ok plan subtest ) ];
+use Test::More import => [ qw( is like note ok plan subtest ) ];
+use Test::Deep  qw( cmp_bag );
 use Test::Fatal qw( dies_ok exception );
 
 use Path::Tiny qw( cwd tempdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 17 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 18 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -46,35 +47,44 @@ subtest "privious migrate() has triggered the \"$tracking_table\" table creation
   plan tests => 2;
 
   is $m->version, 0, 'check version';
-  is_deeply [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ], 'check tables';
+  cmp_bag [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ], 'check tables';
 };
 
 sub migrate_to_version_assertion {
-  my ( $version ) = @_;
-  plan tests => 2;
+  my ( $version, $tables ) = @_;
+  plan tests => 3;
 
   ok $m->migrate( $version ), 'migrate';
   is $m->version, $version, 'check version';
+  cmp_bag [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ map { '"main".' . "\"$_\"" } @$tables ], 'check tables';
 }
 
 my $target_version = 1;
-subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+subtest
+  "migrate to version $target_version" => \&migrate_to_version_assertion,
+  $target_version, [ $tracking_table, 'Manufacturers' ];
 
 $target_version = 2;
-subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+subtest
+  "migrate to version $target_version" => \&migrate_to_version_assertion,
+  $target_version, [ $tracking_table, 'Manufacturers', 'Products' ];
 
 $target_version = 1;
-subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+subtest
+  "migrate to version $target_version" => \&migrate_to_version_assertion,
+  $target_version, [ $tracking_table, 'Manufacturers' ];
 
 $target_version = 0;
-subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version, [ $tracking_table ];
 
 $target_version = 2;
 ok $m->migrate, 'migrate to latest version';
 is $m->version, $target_version, 'check version';
+cmp_bag [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ],
+  [ map { '"main".' . "\"$_\"" } ( $tracking_table, 'Manufacturers', 'Products' ) ], 'check tables';
 
 $target_version = 0;
-subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
+subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version, [ $tracking_table ];
 
 my $m1 = DBIx::Migration->new( tracking_table => $m->tracking_table, dbh => $m->dbh, dir => $m->dir );
 
@@ -90,5 +100,5 @@ my $m2 = DBIx::Migration->new(
 
 $tracking_table = $m2->tracking_table;
 dies_ok { $m2->migrate } 'second migration section is broken';
-is_deeply [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ],
+cmp_bag [ $m2->dbh->tables( '%', '%', '%', 'TABLE' ) ], [ "\"main\".\"$tracking_table\"" ],
   "check tables: creation of \"$tracking_table\" wasn't rolled back";

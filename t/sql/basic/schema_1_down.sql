@@ -1,3 +1,1 @@
-DROP TABLE test1;
-
-DROP TABLE test2;
+DROP TABLE Manufacturers;
