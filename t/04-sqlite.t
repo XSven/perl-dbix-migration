@@ -22,7 +22,7 @@ subtest 'wrong dsn' => sub {
   like exception {
     DBIx::Migration->new(
       dsn => 'dbi:SQLite:dbname=' . cwd->child( qw( t missing test.db ) ),
-      dir => cwd->child( qw( t sql basic ) )
+      dir => cwd->child( qw( t sql advanced ) )
     )->migrate
   }, qr/unable to open database file/, 'calling migrate() throws exception';
 };
@@ -39,7 +39,7 @@ is $m->version, undef, "\"$tracking_table\" table does not exist == migrate() no
 ok $m->dbh->{ Active }, '"dbh" should be an active database handle';
 
 dies_ok { $m->migrate( 0 ) } '"dir" not set';
-$m->dir( cwd->child( qw( t sql basic ) ) );
+$m->dir( cwd->child( qw( t sql advanced ) ) );
 
 ok $m->migrate( 0 ), "initially (if the \"$tracking_table\" table does not exist yet) a database is at version 0";
 

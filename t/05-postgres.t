@@ -60,7 +60,7 @@ subtest "migrate to version $target_version" => \&migrate_to_version_assertion, 
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
-$target_version = 3;
+$target_version = 2;
 ok $m->migrate, 'migrate to latest version';
 is $m->version, $target_version, 'check version';
 
@@ -71,4 +71,4 @@ my $m1 = DBIx::Migration::Pg->new( dbh => $m->dbh, dir => $m->dir );
 
 is $m1->version, 0, '"dbix_migration" table exists and its "version" value is 0';
 
-ok !$m1->migrate( 4 ), 'sql up migration file is missing';
+ok !$m1->migrate( 3 ), 'sql up migration file is missing';

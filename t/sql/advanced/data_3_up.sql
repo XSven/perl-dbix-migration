@@ -9,4 +9,4 @@ INSERT INTO Products (product_id, description, price, stock, manufacturer_id) VA
   (203, 'Rainbow Hopper', 45.0, 20, 902),
   (204, 'TumbleAround', 21.0, 30, 901),
   (205, '2Hi4U', 129.0, 1, 902),
-  (206, 'AirCrusher', 99.0, 3, 902);
+  (206, 'AirCrusher', 99.0, 3, 904); -- 904 violates the foreign key constraint

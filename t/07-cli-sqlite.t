@@ -67,7 +67,7 @@ subtest 'version is undefined' => sub {
   is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
-my $dir = cwd->child( qw( t sql basic ) );
+my $dir = cwd->child( qw( t sql advanced ) );
 subtest 'migrate to version 0' => sub {
   plan tests => 2;
 
