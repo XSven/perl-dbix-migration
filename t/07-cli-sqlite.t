@@ -96,7 +96,7 @@ subtest 'version is latest' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( $dsn ) } "2\n", 'check stdout';
+  stdout_is { $got_exitval = $coderef->( $dsn ) } "3\n", 'check stdout';
   is $got_exitval, EXIT_SUCCESS, 'check exit value';
 };
 
@@ -104,6 +104,6 @@ subtest 'migrate to missing version' => sub {
   plan tests => 2;
 
   my $got_exitval;
-  stdout_is { $got_exitval = $coderef->( $dsn, $dir, 3 ) } '', 'check stdout';
+  stdout_is { $got_exitval = $coderef->( $dsn, $dir, 4 ) } '', 'check stdout';
   is $got_exitval, EXIT_FAILURE, 'check exit value';
 };

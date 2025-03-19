@@ -77,7 +77,7 @@ subtest
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version, [ $tracking_table ];
 
-$target_version = 2;
+$target_version = 3;
 ok $m->migrate, 'migrate to latest version';
 is $m->version, $target_version, 'check version';
 cmp_bag [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ],
@@ -90,7 +90,7 @@ my $m1 = DBIx::Migration->new( tracking_table => $m->tracking_table, dbh => $m->
 
 is $m1->version, 0, "\"$tracking_table\" table exists and its \"version\" value is 0";
 
-ok !$m1->migrate( 3 ), 'return false because sql up migration file is missing';
+ok !$m1->migrate( 4 ), 'return false because sql up migration file is missing';
 
 $tempdir = tempdir( CLEANUP => 1 );
 my $m2 = DBIx::Migration->new(
