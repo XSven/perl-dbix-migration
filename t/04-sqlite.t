@@ -8,7 +8,7 @@ use Test::Fatal qw( dies_ok exception );
 use Path::Tiny qw( cwd tempdir );
 
 eval { require DBD::SQLite };
-plan $@ eq '' ? ( tests => 18 ) : ( skip_all => 'DBD::SQLite required' );
+plan $@ eq '' ? ( tests => 19 ) : ( skip_all => 'DBD::SQLite required' );
 
 require DBIx::Migration;
 
@@ -86,11 +86,20 @@ cmp_bag [ $m->dbh->tables( '%', '%', '%', 'TABLE' ) ],
 $target_version = 0;
 subtest "migrate to version $target_version" => \&migrate_to_version_assertion, $target_version, [ $tracking_table ];
 
-my $m1 = DBIx::Migration->new( tracking_table => $m->tracking_table, dbh => $m->dbh, dir => $m->dir );
+my $m1 = DBIx::Migration->new( dbh => $m->dbh, dir => $m->dir, tracking_table => $m->tracking_table );
 
 is $m1->version, 0, "\"$tracking_table\" table exists and its \"version\" value is 0";
 
 ok !$m1->migrate( 4 ), 'return false because sql up migration file is missing';
+
+like exception {
+  DBIx::Migration->new(
+    dbh            => $m->dbh,
+    dir            => $m->dir,
+    do_before      => [ 'PRAGMA foreign_keys = ON' ],
+    tracking_table => $m->tracking_table
+  )->migrate
+}, qr/FOREIGN KEY constraint failed/, 'set do_before attribute to enable foreign key constraint';
 
 $tempdir = tempdir( CLEANUP => 1 );
 my $m2 = DBIx::Migration->new(
