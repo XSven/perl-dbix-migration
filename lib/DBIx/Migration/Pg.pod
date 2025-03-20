@@ -50,7 +50,7 @@ Get PostgreSQL database specific default list of SQL statements that are
 executed before the migration transaction begins.  The default list contains a
 single statement that assigns the managed schema to the C<search_path> option.
 
-=item $self->do_before
+=item $self->do_while
 
 Get PostgreSQL database specific default list of SQL statements that are
 executed immediately after the migration transaction was enabled.  The default
