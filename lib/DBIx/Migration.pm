@@ -187,9 +187,7 @@ sub version {
   try {
     my $tracking_table = $self->quoted_tracking_table;
     $Logger->debugf( "Read tracking table '%s'", $tracking_table );
-    my $sth = $dbh->prepare( <<"EOF" );
-SELECT value FROM $tracking_table WHERE name = ?;
-EOF
+    my $sth = $dbh->prepare( "SELECT value FROM $tracking_table WHERE name = ?" );
     $sth->execute( 'version' );
     my $version = undef;
     for my $val ( $sth->fetchrow_arrayref ) {
@@ -237,9 +235,7 @@ sub _create_tracking_table {
 
   my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Create tracking table '%s'", $tracking_table );
-  $self->dbh->do( <<"EOF" );
-CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) );
-EOF
+  $self->dbh->do( "CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) )" );
 }
 
 sub _initialize_tracking_table {
@@ -247,9 +243,7 @@ sub _initialize_tracking_table {
 
   my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Initialize tracking table '%s'", $tracking_table );
-  $self->{ _dbh }->do( <<"EOF", undef, 'version', 0 );
-INSERT INTO $tracking_table ( name, value ) VALUES ( ?, ? );
-EOF
+  $self->{ _dbh }->do( "INSERT INTO $tracking_table ( name, value ) VALUES ( ?, ? )", undef, 'version', 0 );
 }
 
 sub _update_tracking_table {
@@ -257,9 +251,7 @@ sub _update_tracking_table {
 
   my $tracking_table = $self->quoted_tracking_table;
   $Logger->debugf( "Update tracking table '%s'", $tracking_table );
-  $self->{ _dbh }->do( <<"EOF", undef, $version, 'version' );
-UPDATE $tracking_table SET value = ? WHERE name = ?;
-EOF
+  $self->{ _dbh }->do( "UPDATE $tracking_table SET value = ? WHERE name = ?", undef, $version, 'version' );
 }
 
 1;

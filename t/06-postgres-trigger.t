@@ -60,15 +60,15 @@ triggers_are 'products', [ "$managed_schema.price_changes" ];
 subtest 'check that the trigger does work' => sub {
   plan tests => 3;
 
-  my $sth = $Test::PgTAP::Dbh->prepare( "INSERT INTO $managed_schema.products (name, price) VALUES (?, ?);" );
+  my $sth = $Test::PgTAP::Dbh->prepare( "INSERT INTO $managed_schema.products (name, price) VALUES (?, ?)" );
   ok $sth->execute( 'Product 1', 10.0 ), 'insert a product';
 
-  $sth = $Test::PgTAP::Dbh->prepare( "UPDATE $managed_schema.products SET price = ? WHERE id = ?;" );
+  $sth = $Test::PgTAP::Dbh->prepare( "UPDATE $managed_schema.products SET price = ? WHERE id = ?" );
   ok $sth->execute( 20.0, 1 ), 'update the previously inserted product';
 
   local $Test::DatabaseRow::dbh = $m->dbh;
   all_row_ok(
-    sql         => "SELECT * FROM $managed_schema.product_price_changes;",
+    sql         => "SELECT * FROM $managed_schema.product_price_changes",
     tests       => [ id => 1, product_id => 1, old_price => 10.0, new_price => 20.0 ],
     description => 'check product changes row'
   );
