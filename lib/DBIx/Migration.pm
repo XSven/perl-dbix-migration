@@ -87,11 +87,27 @@ sub driver {
   return ( DBI->parse_dsn( defined $dsn ? $dsn : $self->dsn ) )[ 1 ];
 }
 
+sub latest {
+  my $self = shift;
+  Dir->assert_valid( $self->dir );
+
+  my $latest = 0;
+  $self->dir->visit(
+    sub {
+      return unless m/_up\.sql\z/;
+      m/\D*(\d+)_up\.sql\z/;
+      $latest = $1 if $1 > $latest;
+    }
+  );
+
+  return $latest;
+}
+
 sub migrate {
   my ( $self, $target ) = @_;
   Dir->assert_valid( $self->dir );
 
-  $target = $self->_latest unless defined $target;
+  $target = $self->latest unless defined $target;
 
   my $fatal_error;
   my $return_value = try {
@@ -213,21 +229,6 @@ sub _files {
   }
 
   return ( @files and @$need == @files ) ? \@files : undef;
-}
-
-sub _latest {
-  my $self = shift;
-
-  my $latest = 0;
-  $self->dir->visit(
-    sub {
-      return unless m/_up\.sql\z/;
-      m/\D*(\d+)_up\.sql\z/;
-      $latest = $1 if $1 > $latest;
-    }
-  );
-
-  return $latest;
 }
 
 sub _create_tracking_table {

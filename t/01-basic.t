@@ -17,7 +17,7 @@ BEGIN {
 # "before" should not be part of the API:
 # https://github.com/haarg/MooX-SetOnce/issues/2
 class_api_ok( $class,
-  qw( before new dsn username password dbh dir do_before do_while tracking_table quoted_tracking_table driver migrate version )
+  qw( before new dsn username password dbh dir do_before do_while tracking_table quoted_tracking_table driver latest migrate version )
 );
 
 class_api_ok( $subclass, qw( new do_before do_while managed_schema tracking_schema quoted_tracking_table ) );
