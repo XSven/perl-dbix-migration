@@ -73,10 +73,12 @@ sub BUILD {
 }
 
 # overrideable
-sub quoted_tracking_table {
+sub create_tracking_table {
   my $self = shift;
 
-  return $self->dbh->quote_identifier( $self->tracking_table );
+  my $tracking_table = $self->quoted_tracking_table;
+  $Logger->debugf( "Create tracking table '%s'", $tracking_table );
+  $self->dbh->do( "CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) )" );
 }
 
 # can be used as an object method ($dsn not specified) and as a class method
@@ -114,7 +116,7 @@ sub migrate {
 
     # on purpose outside of the transaction
     # doesn't use _dbh (the cloned dbh)
-    $self->_create_tracking_table;
+    $self->create_tracking_table;
 
     $self->{ _dbh } = $self->dbh->clone(
       {
@@ -195,6 +197,13 @@ sub migrate {
   return $return_value;
 }
 
+# overrideable
+sub quoted_tracking_table {
+  my $self = shift;
+
+  return $self->dbh->quote_identifier( $self->tracking_table );
+}
+
 sub version {
   my $self = shift;
 
@@ -229,14 +238,6 @@ sub _files {
   }
 
   return ( @files and @$need == @files ) ? \@files : undef;
-}
-
-sub _create_tracking_table {
-  my $self = shift;
-
-  my $tracking_table = $self->quoted_tracking_table;
-  $Logger->debugf( "Create tracking table '%s'", $tracking_table );
-  $self->dbh->do( "CREATE TABLE IF NOT EXISTS $tracking_table ( name VARCHAR(64) PRIMARY KEY, value VARCHAR(64) )" );
 }
 
 sub _initialize_tracking_table {

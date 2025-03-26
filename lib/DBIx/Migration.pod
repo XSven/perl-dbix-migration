@@ -141,9 +141,14 @@ Get tracking table.
 
 =over 
 
+=item $self->create_tracking_table
+
+Create the tracking table if it does not exist yet. This method is overrideable
+in subclasses.
+
 =item $self->driver, $class->driver( $dsn )
 
-Extracts and returns the driver name from the data source name.
+Extract and return the driver name from the data source name.
 
 =item $self->latest
 
@@ -158,8 +163,8 @@ used.
 
 =item $self->quoted_tracking_table
 
-Quotes and returns the tracking table using L<DBI/quote_identifier>. This
-method is overrideable in subclasses.
+Quote and return the tracking table using L<DBI/quote_identifier>. This method
+is overrideable in subclasses.
 
 =item $self->version
 

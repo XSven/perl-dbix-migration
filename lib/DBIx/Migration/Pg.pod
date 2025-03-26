@@ -70,6 +70,11 @@ Get schema that the tracking table belongs to.
 
 =over 
 
+=item $self->create_tracking_table
+
+Create the tracking table if it does not exist yet. Beforehand create the
+tracking schema if it does not exist yet.
+
 =item $self->quoted_tracking_table
 
 Quote tracking table taking the tracking schema into consideration.
