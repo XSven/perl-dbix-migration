@@ -25,7 +25,7 @@ note 'managed schema: ', my $managed_schema = 'myschema';
 note 'dsn: ',            my $dsn            = $pgsql->dsn . ';options=--client_min_messages=WARNING';
 local $Test::PgTAP::Dbh = DBI->connect( $dsn . ";options=--search_path=$managed_schema" );
 
-plan tests => 9;
+plan tests => 10;
 
 require DBIx::Migration::Pg;
 
@@ -34,7 +34,15 @@ my $m = DBIx::Migration::Pg->new(
   dsn            => $dsn,
   dir            => cwd->child( qw( t sql trigger ) )
 );
-my $tracking_schema = $m->tracking_schema;
+
+my $default_tracking_schema = 'public';
+my $default_tracking_table  = 'dbix_migration';
+subtest 'check defaults' => sub {
+  plan tests => 2;
+
+  is $m->tracking_schema, $default_tracking_schema, 'default tracking schema';
+  is $m->tracking_table,  $default_tracking_table,  'default tracking table';
+};
 
 sub migrate_to_version_assertion {
   my ( $version ) = @_;
@@ -48,12 +56,15 @@ my $target_version = 1;
 subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 
 tables_are $managed_schema, [ qw( products ) ], 'Check tables';
-tables_are [ "$tracking_schema.dbix_migration", "$managed_schema.products" ];
+tables_are [ "$default_tracking_schema.$default_tracking_table", "$managed_schema.products" ];
 
 $target_version = 2;
 subtest "Migrate to version $target_version" => \&migrate_to_version_assertion, $target_version;
 tables_are $managed_schema, [ qw( products product_price_changes ) ], 'Check tables';
-tables_are [ "$tracking_schema.dbix_migration", map { "$managed_schema.$_" } qw( products product_price_changes ) ];
+tables_are [
+  "$default_tracking_schema.$default_tracking_table",
+  map { "$managed_schema.$_" } qw( products product_price_changes )
+];
 triggers_are $managed_schema, 'products', [ qw( price_changes ) ];
 triggers_are 'products', [ "$managed_schema.price_changes" ];
 
