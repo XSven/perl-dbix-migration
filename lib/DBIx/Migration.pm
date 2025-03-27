@@ -9,9 +9,10 @@ use MooX::StrictConstructor;
 use DBI                     ();
 use DBI::Const::GetInfoType qw( %GetInfoType );
 use Log::Any                qw( $Logger );
+use String::Expand          qw( expand_string );
 use Try::Tiny               qw( catch try );
 use Types::Path::Tiny       qw( Dir );
-use Types::Standard         qw( ArrayRef Str );
+use Types::Standard         qw( ArrayRef HashRef Str );
 
 use namespace::clean -except => [ qw( before new ) ];
 
@@ -25,6 +26,7 @@ has dir            => ( is => 'rw',   isa => Dir, once => 1, coerce => 1 );
 has do_before      => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
 has do_while       => ( is => 'lazy', isa => ArrayRef [ Str ], default => sub { [] } );
 has tracking_table => ( is => 'ro',   isa => Str, default => 'dbix_migration' );
+has placeholders   => ( is => 'lazy', isa => HashRef [ Str ], default => sub { {} }, init_arg => undef );
 
 sub _build_dbh {
   my $self = shift;
@@ -165,6 +167,7 @@ sub migrate {
         for my $sql ( split /$delimiter/, $text ) {
           $sql =~ s/\A\s*//;
           next unless $sql =~ /\w/;
+          $sql = expand_string( $sql, $self->placeholders );
           # prepend $sql to error message
           local $self->{ _dbh }->{ HandleError } = sub { $_[ 0 ] = "$sql\n$_[0]"; return 0; };
           $self->{ _dbh }->do( $sql );

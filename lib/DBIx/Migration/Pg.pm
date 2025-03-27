@@ -26,6 +26,12 @@ has '+do_while' => (
 );
 has managed_schema  => ( is => 'ro', isa => Str, default => 'public' );
 has tracking_schema => ( is => 'ro', isa => Str, default => 'public' );
+has '+placeholders' => (
+  default => sub {
+    my $self = shift;
+    return { dbix_migration_managed_schema => $self->managed_schema };
+  }
+);
 
 sub create_tracking_table {
   my $self = shift;
