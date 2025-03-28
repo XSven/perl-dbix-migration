@@ -66,7 +66,7 @@ tables_are [
   map { "\"$managed_schema\".$_" } qw( products product_price_changes )
 ];
 triggers_are $managed_schema, 'products', [ qw( price_changes ) ];
-triggers_are 'products', [ "$managed_schema.price_changes" ];
+triggers_are 'products', [ "\"$managed_schema\".price_changes" ];
 
 subtest 'check that the trigger does work' => sub {
   plan tests => 3;
