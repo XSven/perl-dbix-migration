@@ -160,11 +160,12 @@ sub migrate {
         my $name = $file->{ name };
         my $ver  = $file->{ version };
         $Logger->debugf( "Process migration '%s'", $name );
-        my $text      = $name->slurp_raw;
-        my $delimiter = ( $text =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
+        my $content   = $name->slurp_raw;
+        my $delimiter = ( $content =~ m/\A-- *dbix_migration_delimiter: *([[:graph:]])/ ) ? $1 : ';';
         $Logger->debugf( "Migration section delimiter is '%s'", $delimiter );
-        $text =~ s/\s*--.*$//mg;
-        for my $sql ( split /$delimiter/, $text ) {
+        $content =~ s/\s*--.*$//mg;
+        # split content into sections ($sql)
+        for my $sql ( split /$delimiter/, $content ) {
           $sql =~ s/\A\s*//;
           next unless $sql =~ /\w/;
           $sql = expand_string( $sql, $self->placeholders );
