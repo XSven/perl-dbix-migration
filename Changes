@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension DBIx::Migration.
 
-?.?? Mon Mar 31 08:59:19 CEST 2025
+0.25 Mon Mar 31 08:59:19 CEST 2025
         - Require most recent (2.05) Pod::Usage release
         - Fix log adapter setup in CLI sub module
         - Fix documentation
