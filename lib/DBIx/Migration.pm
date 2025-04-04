@@ -11,6 +11,7 @@ use DBI::Const::GetInfoType qw( %GetInfoType );
 use Log::Any                qw( $Logger );
 use String::Expand          qw( expand_string );
 use Try::Tiny               qw( catch try );
+use Types::Common::Numeric  qw( PositiveInt );
 use Types::Path::Tiny       qw( Dir );
 use Types::Standard         qw( ArrayRef HashRef Str );
 
@@ -103,7 +104,7 @@ sub latest {
     }
   );
 
-  return $latest;
+  return PositiveInt->assert_return( $latest );
 }
 
 sub migrate {
