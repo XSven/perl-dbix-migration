@@ -98,8 +98,7 @@ sub latest {
   my $latest = 0;
   $self->dir->visit(
     sub {
-      return unless m/_up\.sql\z/;
-      m/\D*(\d+)_up\.sql\z/;
+      return unless m/\D*(\d+)_up\.sql\z/;
       $latest = $1 if $1 > $latest;
     }
   );
