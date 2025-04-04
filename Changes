@@ -1,4 +1,7 @@
-This file documents the revision history for Perl extension DBIx::Migration.
+Revision history for perl distribution DBIx-Migration
+
+?.??  Fri Apr  4 08:44:19 CEST 2025
+        - Add more files to be cleaned by the clean action
 
 0.25 Mon Mar 31 08:59:19 CEST 2025
         - Require most recent (2.05) Pod::Usage release
