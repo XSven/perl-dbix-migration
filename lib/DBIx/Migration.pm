@@ -2,6 +2,8 @@ package DBIx::Migration;
 
 our $VERSION = '0.25';
 
+use feature qw( state );
+
 use Moo;
 use MooX::SetOnce;
 use MooX::StrictConstructor;
@@ -11,6 +13,7 @@ use DBI::Const::GetInfoType qw( %GetInfoType );
 use Log::Any                qw( $Logger );
 use String::Expand          qw( expand_string );
 use Try::Tiny               qw( catch try );
+use Type::Params            qw( signature );
 use Types::Common::Numeric  qw( PositiveInt );
 use Types::Path::Tiny       qw( Dir );
 use Types::Standard         qw( ArrayRef HashRef Str );
@@ -18,16 +21,17 @@ use Types::Standard         qw( ArrayRef HashRef Str );
 use namespace::clean -except => [ qw( before new ) ];
 
 # 1st alternative set of constructor attributes
-has dsn                         => ( is => 'lazy', isa => Str );
-has [ qw( password username ) ] => ( is => 'ro',   isa => Str );
+has dsn => ( is => 'lazy', isa => Str );
+
+sub _build_dsn {
+  my $self = shift;
+
+  return $self->dbh->get_info( $GetInfoType{ SQL_DATA_SOURCE_NAME } );
+}
+has [ qw( password username ) ] => ( is => 'ro', isa => Str );
+
 # 2nd alternative set of constructor attributes
 has dbh => ( is => 'lazy' );
-
-has dir            => ( is => 'rw',   isa => Dir, once => 1, coerce => 1 );
-has do_before      => ( is => 'lazy', isa => ArrayRef [ Str | ArrayRef ], default => sub { [] } );
-has do_while       => ( is => 'lazy', isa => ArrayRef [ Str | ArrayRef ], default => sub { [] } );
-has tracking_table => ( is => 'ro',   isa => Str, default => 'dbix_migration' );
-has placeholders   => ( is => 'lazy', isa => HashRef [ Str ], default => sub { {} }, init_arg => undef );
 
 sub _build_dbh {
   my $self = shift;
@@ -44,11 +48,16 @@ sub _build_dbh {
   );
 }
 
-sub _build_dsn {
-  my $self = shift;
-
-  return $self->dbh->get_info( $GetInfoType{ SQL_DATA_SOURCE_NAME } );
-}
+my $MigrationsDir = Type::Tiny->new(
+  name       => 'MigrationsDir',
+  parent     => Dir,
+  constraint => sub { __PACKAGE__->latest( $_ ) }
+);
+has dir            => ( is => 'rw',   isa => $MigrationsDir, once => 1, coerce => 1 );
+has do_before      => ( is => 'lazy', isa => ArrayRef [ Str | ArrayRef ], default => sub { [] } );
+has do_while       => ( is => 'lazy', isa => ArrayRef [ Str | ArrayRef ], default => sub { [] } );
+has tracking_table => ( is => 'ro',   isa => Str, default => 'dbix_migration' );
+has placeholders   => ( is => 'lazy', isa => HashRef [ Str ], default => sub { {} }, init_arg => undef );
 
 sub BUILD {
   my ( $self, $args ) = @_;
@@ -93,11 +102,14 @@ sub driver {
 }
 
 sub latest {
-  my $self = shift;
-  Dir->assert_valid( $self->dir );
+  # coercion is implicitly enabled because the Dir type constraint has a coercion
+  state $signature = signature( method => 1, positional => [ Dir, { optional => 1 } ] );
+  my ( $self, $dir ) = $signature->( @_ );
+  $dir = $self->dir unless defined $dir;
+  Dir->assert_valid( undef ) unless defined $dir;
 
   my $latest = 0;
-  $self->dir->visit(
+  $dir->visit(
     sub {
       return unless m/\D*([1-9][0-9]*)_up\.sql\z/;
       $latest = $1 if $1 > $latest;
