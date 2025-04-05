@@ -14,8 +14,9 @@ use Log::Any                qw( $Logger );
 use String::Expand          qw( expand_string );
 use Try::Tiny               qw( catch try );
 use Type::Params            qw( signature );
-use Types::Common::Numeric  qw( PositiveInt );
+use Types::Common::Numeric  qw( PositiveInt PositiveOrZeroInt );
 use Types::Path::Tiny       qw( Dir );
+use Types::Self             qw( Self );
 use Types::Standard         qw( ArrayRef HashRef Str );
 
 use namespace::clean -except => [ qw( before new ) ];
@@ -120,7 +121,8 @@ sub latest {
 }
 
 sub migrate {
-  my ( $self, $target ) = @_;
+  state $signature = signature( method => Self, positional => [ PositiveOrZeroInt, { optional => 1 } ] );
+  my ( $self, $target ) = $signature->( @_ );
   Dir->assert_valid( $self->dir );
 
   $target = $self->latest unless defined $target;

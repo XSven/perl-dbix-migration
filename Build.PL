@@ -45,6 +45,7 @@ my $build = Module::Build->new(
     'String::Expand'            => 0,
     'Try::Tiny'                 => 0,
     'Types::Path::Tiny'         => 0,
+    'Types::Self'               => 0,
     'namespace::clean'          => 0
   },
   create_readme  => 1,
