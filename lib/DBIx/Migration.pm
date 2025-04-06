@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use feature qw( state );
 
