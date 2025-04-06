@@ -1,8 +1,9 @@
 Revision history for perl distribution DBIx-Migration
 
-?.??  Sat Apr  5 11:37:19 AM CEST 2025
+?.??  Sun Apr  6 03:41:30 PM CEST 2025
         - Fix documentation
         - Validate migrate() method signature strictly
+        - Fix Type::Tiny minimum version requirement [Github #1]
 
 0.26 Fri Apr  4 11:47:43 CEST 2025
         - Add more files to be cleaned by the clean action
