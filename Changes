@@ -1,5 +1,8 @@
 Revision history for perl distribution DBIx-Migration
 
+0.28 Mon Apr  7 08:20:04 AM CEST 2025
+        - Fix MigrationsDir constraint (inherit coercion from parent)
+
 0.27 Sun Apr  6 03:41:30 PM CEST 2025
         - Fix documentation
         - Validate migrate() method signature strictly

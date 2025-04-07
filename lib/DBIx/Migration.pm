@@ -1,6 +1,6 @@
 package DBIx::Migration;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use feature qw( state );
 
@@ -52,7 +52,8 @@ sub _build_dbh {
 my $MigrationsDir = Type::Tiny->new(
   name       => 'MigrationsDir',
   parent     => Dir,
-  constraint => sub { __PACKAGE__->latest( $_ ) }
+  constraint => sub { __PACKAGE__->latest( $_ ) },
+  coercion   => 1                                    # inherit from parent
 );
 has dir            => ( is => 'rw',   isa => $MigrationsDir, once => 1, coerce => 1 );
 has do_before      => ( is => 'lazy', isa => ArrayRef [ Str | ArrayRef ], default => sub { [] } );
