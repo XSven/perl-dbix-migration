@@ -128,6 +128,8 @@ sub migrate {
 
   $target = $self->latest unless defined $target;
 
+  $Logger->debugf( "Will use DBI DSN '%s'", $self->dsn );
+
   my $fatal_error;
   my $return_value = try {
 
