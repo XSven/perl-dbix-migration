@@ -30,8 +30,10 @@ provides:
     version: '0.31'
   DBIx::Migration::CLI:
     file: lib/DBIx/Migration/CLI.pm
+    version: '0.31'
   DBIx::Migration::Pg:
     file: lib/DBIx/Migration/Pg.pm
+    version: '0.31'
 recommends:
   Test::Needs: '0'
   Test::Pod: '1.26'
