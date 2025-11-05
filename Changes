@@ -1,8 +1,9 @@
 Revision history for perl distribution DBIx-Migration
 
-0.32 Wed Jul 23 01:03:43 PM CEST 2025
+0.32_01 Wed Nov  5 02:13:09 PM CET 2025
         - Set $VERSION in CLI sub module and Pg sub module explicitly (should
           fix 02packages.details.txt.gz)
+        - Add missing requires prerequisites
 
 0.31 Mon Jun 23 10:17:37 AM CEST 2025
         - Fix DBD::SQLite minimum version requirement

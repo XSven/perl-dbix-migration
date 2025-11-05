@@ -5,7 +5,7 @@ use warnings;
 
 package DBIx::Migration::CLI;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32_01';
 
 use DBIx::Migration           ();
 use Getopt::Std               qw( getopts );
