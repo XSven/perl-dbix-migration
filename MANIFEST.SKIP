@@ -82,3 +82,6 @@
 
 #
 \bcreate_COMPARISONS_pod.pl$
+
+#
+\blocal\b

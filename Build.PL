@@ -59,7 +59,7 @@ my $build = Module::Build->new(
     'meta-spec' => {
       version => 2
     },
-    release_status => 'testing',
+    release_status => 'stable',
     resources => {
       repository => {
         url  => 'git://github.com/XSven/perl-dbix-migration.git',
